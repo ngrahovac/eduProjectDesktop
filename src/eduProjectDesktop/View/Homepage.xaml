@@ -1,0 +1,43 @@
+﻿<Page
+    x:Class="eduProjectDesktop.View.Homepage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:eduProjectDesktop.View"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:c="using:eduProjectDesktop.Model.Display"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Loaded="{x:Bind HomepageViewModel.LoadProjects}">
+
+    <Grid>
+        <NavigationView
+            IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="False"     
+            
+            Header="{x:Bind HomepageViewModel.SectionName, Mode=OneWay}">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="Početna"/>
+                <NavigationViewItem Content="Svi projekti"/>
+                <NavigationViewItem Content="Moji projekti"/>
+                <NavigationViewItem Content="Moje prijave"/>
+            </NavigationView.MenuItems>
+
+
+            <ListView x:Name="ProjectsList" ItemsSource="{x:Bind HomepageViewModel.ProjectSnippets, Mode=OneWay}" >
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="c:ProjectSnippet">
+                        <StackPanel>
+                            <TextBlock Text="{x:Bind ProjectId}"></TextBlock>
+                            <TextBlock Text="{x:Bind ProjectStatus}"></TextBlock>
+                            <TextBlock Text="{x:Bind Title}"></TextBlock>
+                            <TextBlock Text="{x:Bind AuthorFullName}"></TextBlock>
+                            <TextBlock Text="{x:Bind Description}"></TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </NavigationView>
+
+    </Grid>
+</Page>

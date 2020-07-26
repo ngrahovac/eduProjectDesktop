@@ -123,10 +123,49 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Config.cs" />
+    <Compile Include="Data\UsersRepository.cs" />
+    <Compile Include="Data\ProjectsRepository.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\Display\CollaboratorProfileOverview.cs" />
+    <Compile Include="Model\Display\FacultyMemberProfileOverview.cs" />
+    <Compile Include="Model\Display\ProjectPage.cs" />
+    <Compile Include="Model\Display\ProjectSnippet.cs" />
+    <Compile Include="Model\Display\StudentProfileOverview.cs" />
+    <Compile Include="Model\Domain\AcademicRank.cs" />
+    <Compile Include="Model\Domain\Account.cs" />
+    <Compile Include="Model\Domain\CollaboratorProfile.cs" />
+    <Compile Include="Model\Domain\CollaboratorProfileType.cs" />
+    <Compile Include="Model\Domain\Faculty.cs" />
+    <Compile Include="Model\Domain\FacultyMember.cs" />
+    <Compile Include="Model\Domain\FacultyMemberProfile.cs" />
+    <Compile Include="Model\Domain\IAggregateRoot.cs" />
+    <Compile Include="Model\Domain\IEntity.cs" />
+    <Compile Include="Model\Domain\IValueObject.cs" />
+    <Compile Include="Model\Domain\Project.cs" />
+    <Compile Include="Model\Domain\ProjectApplication.cs" />
+    <Compile Include="Model\Domain\ProjectApplicationStatus.cs" />
+    <Compile Include="Model\Domain\ProjectStatus.cs" />
+    <Compile Include="Model\Domain\Student.cs" />
+    <Compile Include="Model\Domain\StudentProfile.cs" />
+    <Compile Include="Model\Domain\StudyField.cs" />
+    <Compile Include="Model\Domain\StudyProgram.cs" />
+    <Compile Include="Model\Domain\StudyProgramSpecialization.cs" />
+    <Compile Include="Model\Domain\Tag.cs" />
+    <Compile Include="Model\Domain\User.cs" />
+    <Compile Include="Model\Domain\UserAccountType.cs" />
+    <Compile Include="Model\Domain\UserSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModel\HomepageViewModel.cs" />
+    <Compile Include="ViewModel\LoginViewModel.cs" />
+    <Compile Include="View\Homepage.xaml.cs">
+      <DependentUpon>Homepage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LoginPage.xaml.cs">
+      <DependentUpon>LoginPage.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -154,13 +193,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="View\Homepage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LoginPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.2.9</Version>
+      <Version>6.2.10</Version>
     </PackageReference>
-    <PackageReference Include="MySql.Data">
-      <Version>8.0.20</Version>
+    <PackageReference Include="MySqlConnector">
+      <Version>1.0.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />

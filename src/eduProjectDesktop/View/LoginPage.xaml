@@ -1,0 +1,20 @@
+﻿<Page
+    x:Class="eduProjectDesktop.View.LoginPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:eduProjectDesktop.View"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" d:DesignWidth="1042" d:DesignHeight="588">
+
+    <Grid>
+        <TextBlock HorizontalAlignment="Left" Margin="192,170,0,0" Text="Username" TextWrapping="Wrap" VerticalAlignment="Top"
+                   FontSize="20" />
+        <TextBlock HorizontalAlignment="Left" Margin="192,219,0,0" Text="Password" TextWrapping="Wrap" VerticalAlignment="Top"
+            FontSize="20"/>
+        <TextBox Name="UsernameTextBox" HorizontalAlignment="Left" Margin="412,170,0,0" Text="username" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="256"/>
+        <TextBox Name="PasswordTextBox" HorizontalAlignment="Left" Margin="412,215,0,0" Text="password" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="256"/>
+        <Button Name="LoginButton" Content="Login" Margin="459,294,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.177,-1.5" FontSize="20" Width="163" Click="{x:Bind LoginViewModel.LoginButton_Click}"/>
+    </Grid>
+</Page>

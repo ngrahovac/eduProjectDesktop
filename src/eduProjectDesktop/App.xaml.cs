@@ -1,5 +1,9 @@
-﻿using Windows.ApplicationModel;
+﻿using eduProjectDesktop.Data;
+using eduProjectDesktop.View;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.Foundation;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -11,10 +15,17 @@ namespace eduProjectDesktop
 {
     sealed partial class App : Application
     {
+        public readonly ProjectsRepository projects;
+        public readonly UsersRepository users;
+
         public App()
         {
             InitializeComponent();
             Suspending += OnSuspending;
+
+            // repositories jer nemam DI u UWP
+            projects = new ProjectsRepository();
+            users = new UsersRepository();
         }
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)
@@ -25,7 +36,7 @@ namespace eduProjectDesktop
                 rootFrame = new Frame();
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
-                   //TODO: Load state from previously suspended application.
+                    //TODO: Load state from previously suspended application.
                 }
                 Window.Current.Content = rootFrame;
             }
@@ -33,7 +44,10 @@ namespace eduProjectDesktop
             {
                 if (rootFrame.Content == null)
                 {
-                    rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                    ApplicationView.PreferredLaunchViewSize = new Size(1200, 700);
+                    ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
+
+                    rootFrame.Navigate(typeof(Homepage), e.Arguments);
                 }
                 Window.Current.Activate();
             }
@@ -45,5 +59,7 @@ namespace eduProjectDesktop
             //TODO: Save application state and stop any background activity.
             deferral.Complete();
         }
+
+
     }
 }
