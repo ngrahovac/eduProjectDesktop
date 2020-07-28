@@ -14,13 +14,13 @@ namespace eduProjectDesktop.Model.Display
         public string AuthorFullName { get; set; }
         public StudyField StudyField { get; set; }
         public string Description { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
-        public ICollection<FacultyMemberProfileDisplayModel> FacultyMemberProfileDisplayModels { get; set; } = new HashSet<FacultyMemberProfileDisplayModel>();// ZORANE bolji naziv?
-        public ICollection<StudentProfileDisplayModel> StudentProfileDisplayModels { get; set; } = new HashSet<StudentProfileDisplayModel>();
+        public string StartDate { get; set; }
+        public string EndDate { get; set; }
+        public ICollection<FacultyMemberProfileOverview> FacultyMemberProfileDisplayModels { get; set; } = new HashSet<FacultyMemberProfileOverview>();// ZORANE bolji naziv?
+        public ICollection<StudentProfileOverview> StudentProfileDisplayModels { get; set; } = new HashSet<StudentProfileOverview>();
         public ICollection<Tag> Tags { get; set; } = new HashSet<Tag>();
 
-        public static ProjectOverview FromProject(Project project, User author)
+        public static ProjectOverview FromProject(Project project, User author, bool isAdmin = false)
         {
             ProjectOverview model = new ProjectOverview();
 
@@ -31,8 +31,8 @@ namespace eduProjectDesktop.Model.Display
                 model.AuthorFullName = $"{author.FirstName} {author.LastName}";
             model.StudyField = project.StudyField;
             model.Description = project.Description;
-            model.StartDate = project.StartDate;
-            model.EndDate = project.EndDate;
+            model.StartDate = project.StartDate.ToString(); ;
+            model.EndDate = project.EndDate.ToString();
 
             foreach (var tag in project.Tags)
                 model.Tags.Add(tag);
@@ -41,11 +41,11 @@ namespace eduProjectDesktop.Model.Display
             {
                 if (profile is StudentProfile)
                 {
-                    model.StudentProfileDisplayModels.Add(StudentProfileDisplayModel.FromStudentProfile((StudentProfile)profile));
+                    model.StudentProfileDisplayModels.Add(StudentProfileOverview.FromStudentProfile((StudentProfile)profile));
                 }
                 else if (profile is FacultyMemberProfile)
                 {
-                    model.FacultyMemberProfileDisplayModels.Add(FacultyMemberProfileDisplayModel.FromFacultyMemberProfile((FacultyMemberProfile)profile));
+                    model.FacultyMemberProfileDisplayModels.Add(FacultyMemberProfileOverview.FromFacultyMemberProfile((FacultyMemberProfile)profile));
                 }
             }
 

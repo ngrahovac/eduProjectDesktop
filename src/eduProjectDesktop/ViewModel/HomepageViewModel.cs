@@ -46,6 +46,10 @@ namespace eduProjectDesktop.ViewModel
             get { return isProjectPageVisible; }
             set { isProjectPageVisible = value; OnPropertyChanged(); }
         }
+
+        private bool ifEditing = false;
+
+        public bool IfEditing { get { return ifEditing; } set { ifEditing = value; OnPropertyChanged(); } }
         public HomepageViewModel()
         {
 
@@ -92,7 +96,7 @@ namespace eduProjectDesktop.ViewModel
             {
                 IsHomepageVisible = Visibility.Visible;
                 IsProjectPageVisible = Visibility.Collapsed;
-                SelectedSnippetIndex = -1;
+                SelectedSnippetIndex = -1;  // TwoWay bound, so this will clear list item selection
             });
         }
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)

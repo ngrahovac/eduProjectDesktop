@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     xmlns:c="using:eduProjectDesktop.Model.Display"
+    xmlns:c1="using:eduProjectDesktop.Model.Domain"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     Loaded="{x:Bind HomepageViewModel.LoadProjects}">
 
@@ -79,15 +80,17 @@
 
                     <TextBlock Grid.Column="0"
                                Grid.Row="2">Naziv</TextBlock>
-                    <TextBlock Grid.Column="1"
+                    <TextBox Grid.Column="1"
                                Grid.Row="2"
-                               Text="{x:Bind HomepageViewModel.ProjectOverview.Title, Mode=OneWay}"></TextBlock>
+                             IsEnabled="{x:Bind HomepageViewModel.IfEditing}"
+                               Text="{x:Bind HomepageViewModel.ProjectOverview.Title, Mode=TwoWay}"></TextBox>
 
                     <TextBlock Grid.Column="0"
                                Grid.Row="3">Opis</TextBlock>
-                    <TextBlock Grid.Column="1"
+                    <TextBox Grid.Column="1"
                                Grid.Row="3"
-                               Text="{x:Bind HomepageViewModel.ProjectOverview.Description, Mode=OneWay}"></TextBlock>
+                             IsEnabled="{x:Bind HomepageViewModel.IfEditing}"
+                               Text="{x:Bind HomepageViewModel.ProjectOverview.Description, Mode=TwoWay}"></TextBox>
 
                     <TextBlock Grid.Column="0"
                                Grid.Row="4">Autor</TextBlock>
@@ -97,36 +100,73 @@
 
                     <TextBlock Grid.Column="0"
                                Grid.Row="5">Naučna oblast</TextBlock>
-                    <TextBlock Grid.Column="1"
-                               Grid.Row="5"
-                               Text="{x:Bind HomepageViewModel.ProjectOverview.StudyField.Name, Mode=OneWay}"></TextBlock>
+                    <!-- zasad string i kucanje -->
+                    <TextBox Grid.Column="1"
+                               Grid.Row="5"                       
+                             IsEnabled="{x:Bind HomepageViewModel.IfEditing}"
+                               Text="{x:Bind HomepageViewModel.ProjectOverview.StudyField.Name, Mode=TwoWay}"></TextBox>
 
                     <TextBlock Grid.Column="0"
                                Grid.Row="6">Početak</TextBlock>
-                    <TextBlock Grid.Column="1"
+                    <TextBox Grid.Column="1"
                                Grid.Row="6"
-                               Text="{x:Bind HomepageViewModel.ProjectOverview.StartDate, Mode=OneWay}"></TextBlock>
+                             IsEnabled="{x:Bind HomepageViewModel.IfEditing}"
+                               Text="{x:Bind HomepageViewModel.ProjectOverview.StartDate, Mode=TwoWay}"></TextBox>
 
                     <TextBlock Grid.Column="0"
                                Grid.Row="7">Kraj</TextBlock>
-                    <TextBlock Grid.Column="1"
+                    <TextBox Grid.Column="1"
                                Grid.Row="7"
-                               Text="{x:Bind HomepageViewModel.ProjectOverview.EndDate, Mode=OneWay}"></TextBlock>
+                             IsEnabled="{x:Bind HomepageViewModel.IfEditing}"
+                               Text="{x:Bind HomepageViewModel.ProjectOverview.EndDate, Mode=TwoWay}"></TextBox>
 
                     <TextBlock Grid.Column="0"
-                               Grid.Row="9">Profili nastavnog osoblja</TextBlock>
+                               Grid.Row="9">Profili studenata</TextBlock>
                     <ListView Grid.Column="1"
-                              Grid.Row="9"></ListView>
+                              Grid.Row="9"
+                              ItemsSource="{x:Bind HomepageViewModel.ProjectOverview.StudentProfileDisplayModels, Mode=OneWay}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="c:StudentProfileOverview">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{x:Bind FacultyName}"></TextBlock>
+                                    <TextBlock Text="{x:Bind StudyProgramName}"></TextBlock>
+                                    <TextBlock Text="{x:Bind StudyProgramSpecializationName}"></TextBlock>
+                                    <TextBlock Text="{x:Bind StudyCycle}"></TextBlock>
+                                    <TextBlock Text="{x:Bind StudyYear}"></TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
 
                     <TextBlock Grid.Column="0"
-                               Grid.Row="10">Profili studenata</TextBlock>
+                               Grid.Row="10">Profili nastavnog osoblja</TextBlock>
                     <ListView Grid.Column="1"
-                              Grid.Row="10"></ListView>
+                              Grid.Row="10"
+                              ItemsSource="{x:Bind HomepageViewModel.ProjectOverview.FacultyMemberProfileDisplayModels, Mode=OneWay}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="c:FacultyMemberProfileOverview">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{x:Bind FacultyName}"></TextBlock>
+                                    <TextBlock Text="{x:Bind StudyFieldName}"></TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
 
+                    </ListView>
                     <TextBlock Grid.Column="0"
                                Grid.Row="11">Tagovi</TextBlock>
-                    <StackPanel Orientation="Horizontal" Grid.Column="1"
-                              Grid.Row="11"></StackPanel>
+                    <GridView  Grid.Column="1"
+                              Grid.Row="11"
+                               ItemsSource="{x:Bind HomepageViewModel.ProjectOverview.Tags, Mode=OneWay}">
+                        <GridView.ItemTemplate>
+                            <DataTemplate x:DataType="c1:Tag">
+                                <TextBlock Text="{x:Bind Name}"></TextBlock>
+                            </DataTemplate>
+                        </GridView.ItemTemplate>
+
+
+                    </GridView>
+
 
 
                 </Grid>

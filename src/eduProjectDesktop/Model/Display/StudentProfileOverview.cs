@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace eduProjectDesktop.Model.Display
 {
-    public class StudentProfileDisplayModel : CollaboratorProfileDisplayModel
+    public class StudentProfileOverview : CollaboratorProfileOverview
     {
         public string FacultyName { get; set; }
         public string StudyProgramName { get; set; }
@@ -14,11 +14,11 @@ namespace eduProjectDesktop.Model.Display
         public int? StudyCycle { get; set; }
         public int? StudyYear { get; set; }
 
-        public StudentProfileDisplayModel()
+        public StudentProfileOverview()
         {
 
         }
-        public StudentProfileDisplayModel(string facultyName, string studyProgramName, string studyProgramSpecializationName,
+        public StudentProfileOverview(string facultyName, string studyProgramName, string studyProgramSpecializationName,
                                           int? studyCycle, int? studyYear, string description)
         {
             Description = description;
@@ -29,9 +29,9 @@ namespace eduProjectDesktop.Model.Display
             StudyYear = studyYear;
         }
 
-        public static StudentProfileDisplayModel FromStudentProfile(StudentProfile profile)
+        public static StudentProfileOverview FromStudentProfile(StudentProfile profile)
         {
-            StudentProfileDisplayModel model = new StudentProfileDisplayModel();
+            StudentProfileOverview model = new StudentProfileOverview();
             model.FacultyName = profile.Faculty.Name;
             model.StudyProgramName = profile.StudyProgram.Name;
             model.StudyProgramSpecializationName = profile.StudyProgramSpecialization.Name;

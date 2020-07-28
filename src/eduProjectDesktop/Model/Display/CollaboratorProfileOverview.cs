@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace eduProjectDesktop.Model.Display
 {
-    public class CollaboratorProfileDisplayModel
+    public class CollaboratorProfileOverview
     {
         public string Description { get; set; }
     }

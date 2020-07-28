@@ -13,6 +13,8 @@ namespace eduProjectDesktop.Model.Domain
         public ICollection<int> ProjectApplicationIds { get; set; }
         public ICollection<int> ProjectCollaborationIds { get; set; }
 
+        public static int CurrentUserId { get; set; }
+
 
     }
 }

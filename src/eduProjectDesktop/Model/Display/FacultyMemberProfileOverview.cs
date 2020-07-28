@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 
 namespace eduProjectDesktop.Model.Display
 {
-    public class FacultyMemberProfileDisplayModel : CollaboratorProfileDisplayModel
+    public class FacultyMemberProfileOverview : CollaboratorProfileOverview
     {
         public string FacultyName { get; set; }
         public string StudyFieldName { get; set; }
 
-        public FacultyMemberProfileDisplayModel()
+        public FacultyMemberProfileOverview()
         {
 
         }
-        public static FacultyMemberProfileDisplayModel FromFacultyMemberProfile(FacultyMemberProfile profile)
+        public static FacultyMemberProfileOverview FromFacultyMemberProfile(FacultyMemberProfile profile)
         {
-            FacultyMemberProfileDisplayModel model = new FacultyMemberProfileDisplayModel();
+            FacultyMemberProfileOverview model = new FacultyMemberProfileOverview();
 
             model.FacultyName = profile.Faculty.Name;
             model.StudyFieldName = profile.StudyField.Name;
