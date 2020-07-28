@@ -8,17 +8,16 @@ namespace eduProjectDesktop.Data
 {
     public class UsersRepository
     {
-        private readonly MySqlConnection dbConnection;
         public UsersRepository()
         {
-            dbConnection = new MySqlConnection(Config.dbConnectionString);
+
         }
 
         public async Task<User> GetAsync(int id)
         {
             User user = null;
 
-            using (dbConnection)
+            using (MySqlConnection dbConnection = new MySqlConnection(Config.dbConnectionString))
             {
                 await dbConnection.OpenAsync();
 

@@ -26,5 +26,7 @@ namespace eduProjectDesktop.View
             this.InitializeComponent();
             HomepageViewModel = new HomepageViewModel();
         }
+
+
     }
 }

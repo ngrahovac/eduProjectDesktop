@@ -131,7 +131,7 @@
     </Compile>
     <Compile Include="Model\Display\CollaboratorProfileOverview.cs" />
     <Compile Include="Model\Display\FacultyMemberProfileOverview.cs" />
-    <Compile Include="Model\Display\ProjectPage.cs" />
+    <Compile Include="Model\Display\ProjectOverview.cs" />
     <Compile Include="Model\Display\ProjectSnippet.cs" />
     <Compile Include="Model\Display\StudentProfileOverview.cs" />
     <Compile Include="Model\Domain\AcademicRank.cs" />

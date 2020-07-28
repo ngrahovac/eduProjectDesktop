@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace eduProjectDesktop.Model.Display
 {
-    public class ProjectDisplayModel
+    public class ProjectOverview
     {
         public int ProjectId { get; set; }
         public string ProjectStatus { get; set; }
@@ -20,9 +20,9 @@ namespace eduProjectDesktop.Model.Display
         public ICollection<StudentProfileDisplayModel> StudentProfileDisplayModels { get; set; } = new HashSet<StudentProfileDisplayModel>();
         public ICollection<Tag> Tags { get; set; } = new HashSet<Tag>();
 
-        public static ProjectDisplayModel FromProject(Project project, User author)
+        public static ProjectOverview FromProject(Project project, User author)
         {
-            ProjectDisplayModel model = new ProjectDisplayModel();
+            ProjectOverview model = new ProjectOverview();
 
             model.ProjectId = project.ProjectId;
             model.ProjectStatus = project.ProjectStatus.ToString();

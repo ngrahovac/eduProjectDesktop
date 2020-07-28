@@ -11,32 +11,127 @@
     Loaded="{x:Bind HomepageViewModel.LoadProjects}">
 
     <Grid>
+        <!-- IsBackButtonVisible ne mozemo bind sa Visibility, skontati drugi nacin -->
         <NavigationView
-            IsBackButtonVisible="Collapsed"
             IsSettingsVisible="False"     
-            
-            Header="{x:Bind HomepageViewModel.SectionName, Mode=OneWay}">
+            IsBackButtonVisible="Visible"
+            IsBackEnabled="True"
+            BackRequested="{x:Bind HomepageViewModel.CloseProjectPage}"
+            Header="{x:Bind HomepageViewModel.SectionName, Mode=OneWay}"
+            >
             <NavigationView.MenuItems>
                 <NavigationViewItem Content="Početna"/>
                 <NavigationViewItem Content="Svi projekti"/>
                 <NavigationViewItem Content="Moji projekti"/>
                 <NavigationViewItem Content="Moje prijave"/>
             </NavigationView.MenuItems>
+            <StackPanel>
+                <ListView x:Name="ProjectsList" ItemsSource="{x:Bind HomepageViewModel.ProjectSnippets, Mode=OneWay}"
+                      Visibility="{x:Bind HomepageViewModel.IsHomepageVisible, Mode=OneWay}"
+                      SelectionChanged="{x:Bind HomepageViewModel.ShowProjectPage}"
+                      SelectedItem="{x:Bind HomepageViewModel.SelectedSnippet, Mode=TwoWay}"
+                      SelectedIndex="{x:Bind HomepageViewModel.SelectedSnippetIndex, Mode=TwoWay}">
+
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="c:ProjectSnippet">
+                            <StackPanel>
+                                <TextBlock Text="{x:Bind ProjectId}"></TextBlock>
+                                <TextBlock Text="{x:Bind ProjectStatus}"></TextBlock>
+                                <TextBlock Text="{x:Bind Title}"></TextBlock>
+                                <TextBlock Text="{x:Bind AuthorFullName}"></TextBlock>
+                                <TextBlock Text="{x:Bind Description}"></TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Grid x:Name="ProjectDetails"
+                      Visibility="{x:Bind HomepageViewModel.IsProjectPageVisible, Mode=OneWay}"
+                          Margin="50">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="0">ID</TextBlock>
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="0"
+                               Text="{x:Bind HomepageViewModel.ProjectOverview.ProjectId, Mode=OneWay}"></TextBlock>
+
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="1">Status</TextBlock>
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="1"
+                               Text="{x:Bind HomepageViewModel.ProjectOverview.ProjectStatus, Mode=OneWay}"></TextBlock>
+
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="2">Naziv</TextBlock>
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="2"
+                               Text="{x:Bind HomepageViewModel.ProjectOverview.Title, Mode=OneWay}"></TextBlock>
+
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="3">Opis</TextBlock>
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="3"
+                               Text="{x:Bind HomepageViewModel.ProjectOverview.Description, Mode=OneWay}"></TextBlock>
+
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="4">Autor</TextBlock>
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="4"
+                               Text="{x:Bind HomepageViewModel.ProjectOverview.AuthorFullName, Mode=OneWay}"></TextBlock>
+
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="5">Naučna oblast</TextBlock>
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="5"
+                               Text="{x:Bind HomepageViewModel.ProjectOverview.StudyField.Name, Mode=OneWay}"></TextBlock>
+
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="6">Početak</TextBlock>
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="6"
+                               Text="{x:Bind HomepageViewModel.ProjectOverview.StartDate, Mode=OneWay}"></TextBlock>
+
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="7">Kraj</TextBlock>
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="7"
+                               Text="{x:Bind HomepageViewModel.ProjectOverview.EndDate, Mode=OneWay}"></TextBlock>
+
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="9">Profili nastavnog osoblja</TextBlock>
+                    <ListView Grid.Column="1"
+                              Grid.Row="9"></ListView>
+
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="10">Profili studenata</TextBlock>
+                    <ListView Grid.Column="1"
+                              Grid.Row="10"></ListView>
+
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="11">Tagovi</TextBlock>
+                    <StackPanel Orientation="Horizontal" Grid.Column="1"
+                              Grid.Row="11"></StackPanel>
 
 
-            <ListView x:Name="ProjectsList" ItemsSource="{x:Bind HomepageViewModel.ProjectSnippets, Mode=OneWay}" >
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="c:ProjectSnippet">
-                        <StackPanel>
-                            <TextBlock Text="{x:Bind ProjectId}"></TextBlock>
-                            <TextBlock Text="{x:Bind ProjectStatus}"></TextBlock>
-                            <TextBlock Text="{x:Bind Title}"></TextBlock>
-                            <TextBlock Text="{x:Bind AuthorFullName}"></TextBlock>
-                            <TextBlock Text="{x:Bind Description}"></TextBlock>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                </Grid>
+
+            </StackPanel>
         </NavigationView>
 
     </Grid>
