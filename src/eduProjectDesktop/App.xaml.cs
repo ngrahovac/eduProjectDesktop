@@ -1,4 +1,5 @@
 ﻿using eduProjectDesktop.Data;
+using eduProjectDesktop.Model.Domain;
 using eduProjectDesktop.View;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
@@ -17,15 +18,20 @@ namespace eduProjectDesktop
     {
         public readonly ProjectsRepository projects;
         public readonly UsersRepository users;
+        public readonly ProjectApplicationsRepository applications;
 
         public App()
         {
+            // Zoran
+            User.CurrentUserId = 10; // TODO: implement logging
+
             InitializeComponent();
             Suspending += OnSuspending;
 
             // repositories jer nemam DI u UWP
             projects = new ProjectsRepository();
             users = new UsersRepository();
+            applications = new ProjectApplicationsRepository();
         }
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)

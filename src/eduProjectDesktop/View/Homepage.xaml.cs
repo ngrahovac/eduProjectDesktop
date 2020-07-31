@@ -21,12 +21,14 @@ namespace eduProjectDesktop.View
     public sealed partial class Homepage : Page
     {
         public HomepageViewModel HomepageViewModel { get; set; }
+
+        public ProjectPageViewModel ProjectPageViewModel { get; set; }
         public Homepage()
         {
             this.InitializeComponent();
             HomepageViewModel = new HomepageViewModel();
+            ProjectPageViewModel = new ProjectPageViewModel();
+            HomepageViewModel.ProjectPageViewModel = ProjectPageViewModel;
         }
-
-
     }
 }

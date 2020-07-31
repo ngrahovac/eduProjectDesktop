@@ -24,16 +24,16 @@ namespace eduProjectDesktop.Data
                 command.Connection = dbConnection;
 
                 // read project attributes from table `project`
-                ReadBasicProjectInfo(command, id, project);
+                await ReadBasicProjectInfo(command, id, project);
 
                 // read collaborator profiles from  table `collaborator_profiles`
-                ReadCollaboratorProfilesInfo(command, id, project);
+                await ReadCollaboratorProfilesInfo(command, id, project);
 
                 // read tag ids from table `project_tag`
-                ReadTagsInfo(command, id, project);
+                await ReadTagsInfo(command, id, project);
 
                 // read collaborator ids from table `project_collaborator`
-                ReadCollaboratorIds(command, id, project);
+                await ReadCollaboratorIds(command, id, project);
 
                 await dbConnection.CloseAsync();
             }
@@ -43,7 +43,7 @@ namespace eduProjectDesktop.Data
 
         // PRIVATE HELPER METHODS //////////////////////////////////////////////////////////////////////
 
-        private void ReadCollaboratorIds(MySqlCommand command, int id, Project project)
+        private async Task ReadCollaboratorIds(MySqlCommand command, int id, Project project)
         {
             string readCollaboratorsCommandText = @"SELECT user_id
                                                     FROM project_collaborator
@@ -52,7 +52,7 @@ namespace eduProjectDesktop.Data
             command.CommandText = readCollaboratorsCommandText;
             command.Parameters.Clear();
             command.Parameters.Add(new MySqlParameter { DbType = DbType.Int32, ParameterName = "@id", Value = id });
-            using (var reader = command.ExecuteReader())
+            using (var reader = await command.ExecuteReaderAsync())
             {
                 if (reader.HasRows)
                 {
@@ -66,7 +66,7 @@ namespace eduProjectDesktop.Data
 
         }
 
-        private void ReadTagsInfo(MySqlCommand command, int id, Project project)
+        private async Task ReadTagsInfo(MySqlCommand command, int id, Project project)
         {
             string readTagsCommandText = @"SELECT name, description
                                            FROM tag
@@ -76,7 +76,7 @@ namespace eduProjectDesktop.Data
             command.CommandText = readTagsCommandText;
             command.Parameters.Clear();
             command.Parameters.Add(new MySqlParameter { DbType = DbType.Int32, ParameterName = "@id", Value = id });
-            using (var reader = command.ExecuteReader())
+            using (var reader = await command.ExecuteReaderAsync())
             {
                 if (reader.HasRows)
                 {
@@ -88,7 +88,7 @@ namespace eduProjectDesktop.Data
             }
         }
 
-        private void ReadBasicProjectInfo(MySqlCommand command, int id, Project project)
+        private async Task ReadBasicProjectInfo(MySqlCommand command, int id, Project project)
         {
             string readProjectCommandText = @"SELECT project_id, title,  start_date, end_date, project.description, project.study_field_id, project_status_id, user_id,
                                                      study_field.name, study_field.description
@@ -100,7 +100,7 @@ namespace eduProjectDesktop.Data
             command.Parameters.Clear();
             command.Parameters.Add(new MySqlParameter { DbType = DbType.Int32, ParameterName = "@id", Value = id });
 
-            using (var reader = command.ExecuteReader())
+            using (var reader = await command.ExecuteReaderAsync())
             {
                 if (reader.HasRows)
                 {
@@ -122,7 +122,7 @@ namespace eduProjectDesktop.Data
 
         }
 
-        private void ReadCollaboratorProfilesInfo(MySqlCommand command, int id, Project project)
+        private async Task ReadCollaboratorProfilesInfo(MySqlCommand command, int id, Project project)
         {
             string readCollaboratorProfilesCommandText = @"SELECT collaborator_profile_id, collaborator_profile.description, user_account_type_id, 
 	                                                       student_profile.cycle, study_year,
@@ -141,7 +141,7 @@ namespace eduProjectDesktop.Data
             command.Parameters.Clear();
             command.Parameters.Add(new MySqlParameter { DbType = DbType.Int32, ParameterName = "@id", Value = id });
 
-            using (var reader = command.ExecuteReader())
+            using (var reader = await command.ExecuteReaderAsync())
             {
                 if (reader.HasRows)
                 {

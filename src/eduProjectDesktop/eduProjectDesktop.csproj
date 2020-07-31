@@ -124,6 +124,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Config.cs" />
+    <Compile Include="Data\ProjectApplicationsRepository.cs" />
     <Compile Include="Data\UsersRepository.cs" />
     <Compile Include="Data\ProjectsRepository.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -160,6 +161,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\HomepageViewModel.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
+    <Compile Include="ViewModel\ProjectPageViewModel.cs" />
     <Compile Include="View\Homepage.xaml.cs">
       <DependentUpon>Homepage.xaml</DependentUpon>
     </Compile>
