@@ -8,74 +8,72 @@ namespace eduProjectDesktop.Data
 {
     public class ProjectsRepository
     {
-        public ProjectsRepository()
-        {
-
-        }
         public async Task<Project> GetAsync(int id)
         {
             Project project = new Project();
 
-            using (MySqlConnection dbConnection = new MySqlConnection(Config.dbConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(Config.dbConnectionString))
             {
-                await dbConnection.OpenAsync();
+                await connection.OpenAsync();
+                MySqlCommand command = new MySqlCommand
+                {
+                    Connection = connection
+                };
 
-                MySqlCommand command = new MySqlCommand();
-                command.Connection = dbConnection;
-
-                // read project attributes from table `project`
                 await ReadBasicProjectInfo(command, id, project);
-
-                // read collaborator profiles from  table `collaborator_profiles`
                 await ReadCollaboratorProfilesInfo(command, id, project);
-
-                // read tag ids from table `project_tag`
                 await ReadTagsInfo(command, id, project);
-
-                // read collaborator ids from table `project_collaborator`
                 await ReadCollaboratorIds(command, id, project);
 
-                await dbConnection.CloseAsync();
+                await connection.CloseAsync();
             }
 
             return project;
         }
 
-        // PRIVATE HELPER METHODS //////////////////////////////////////////////////////////////////////
-
         private async Task ReadCollaboratorIds(MySqlCommand command, int id, Project project)
         {
-            string readCollaboratorsCommandText = @"SELECT user_id
-                                                    FROM project_collaborator
-                                                    WHERE project_collaborator.project_id = @id";
+            string commandText = @"SELECT user_id
+                                   FROM project_collaborator
+                                   WHERE project_collaborator.project_id = @id";
 
-            command.CommandText = readCollaboratorsCommandText;
+            command.CommandText = commandText;
             command.Parameters.Clear();
-            command.Parameters.Add(new MySqlParameter { DbType = DbType.Int32, ParameterName = "@id", Value = id });
+            command.Parameters.Add(new MySqlParameter
+            {
+                DbType = DbType.Int32,
+                ParameterName = "@id",
+                Value = id
+            });
+
             using (var reader = await command.ExecuteReaderAsync())
             {
                 if (reader.HasRows)
                 {
-                    int row = 0;
                     while (reader.Read())
                     {
-                        project.CollaboratorIds.Add(reader.GetInt32(row++));
+                        project.CollaboratorIds.Add(reader.GetInt32(0));
                     }
                 }
             }
-
         }
 
         private async Task ReadTagsInfo(MySqlCommand command, int id, Project project)
         {
-            string readTagsCommandText = @"SELECT name, description
-                                           FROM tag
-                                           INNER JOIN project_tag USING(tag_id)
-                                           WHERE project_tag.project_id = @id";
+            string commandText = @"SELECT name, description
+                                   FROM tag
+                                   INNER JOIN project_tag USING(tag_id)
+                                   WHERE project_tag.project_id = @id";
 
-            command.CommandText = readTagsCommandText;
+            command.CommandText = commandText;
             command.Parameters.Clear();
-            command.Parameters.Add(new MySqlParameter { DbType = DbType.Int32, ParameterName = "@id", Value = id });
+            command.Parameters.Add(new MySqlParameter
+            {
+                DbType = DbType.Int32,
+                ParameterName = "@id",
+                Value = id
+            });
+
             using (var reader = await command.ExecuteReaderAsync())
             {
                 if (reader.HasRows)
@@ -90,15 +88,20 @@ namespace eduProjectDesktop.Data
 
         private async Task ReadBasicProjectInfo(MySqlCommand command, int id, Project project)
         {
-            string readProjectCommandText = @"SELECT project_id, title,  start_date, end_date, project.description, project.study_field_id, project_status_id, user_id,
+            string commandText = @"SELECT project_id, title,  start_date, end_date, project.description, project.study_field_id, project_status_id, user_id,
                                                      study_field.name, study_field.description
                                               FROM project
                                               INNER JOIN study_field ON project.study_field_id = study_field.study_field_id
                                               WHERE project.project_id = @id";
 
-            command.CommandText = readProjectCommandText;
+            command.CommandText = commandText;
             command.Parameters.Clear();
-            command.Parameters.Add(new MySqlParameter { DbType = DbType.Int32, ParameterName = "@id", Value = id });
+            command.Parameters.Add(new MySqlParameter
+            {
+                DbType = DbType.Int32,
+                ParameterName = "@id",
+                Value = id
+            });
 
             using (var reader = await command.ExecuteReaderAsync())
             {
@@ -119,12 +122,11 @@ namespace eduProjectDesktop.Data
                     }
                 }
             }
-
         }
 
         private async Task ReadCollaboratorProfilesInfo(MySqlCommand command, int id, Project project)
         {
-            string readCollaboratorProfilesCommandText = @"SELECT collaborator_profile_id, collaborator_profile.description, user_account_type_id, 
+            string commandText = @"SELECT collaborator_profile_id, collaborator_profile.description, user_account_type_id, 
 	                                                       student_profile.cycle, study_year,
 	                                                       faculty.name, study_program.name, study_program_specialization.name,       
 	                                                       study_field.name, study_field.description
@@ -137,9 +139,14 @@ namespace eduProjectDesktop.Data
                                                            LEFT OUTER JOIN study_field ON faculty_member_profile.study_field_id = study_field.study_field_id
                                                            WHERE project_id = @id";
 
-            command.CommandText = readCollaboratorProfilesCommandText;
+            command.CommandText = commandText;
             command.Parameters.Clear();
-            command.Parameters.Add(new MySqlParameter { DbType = DbType.Int32, ParameterName = "@id", Value = id });
+            command.Parameters.Add(new MySqlParameter
+            {
+                DbType = DbType.Int32,
+                ParameterName = "@id",
+                Value = id
+            });
 
             using (var reader = await command.ExecuteReaderAsync())
             {
@@ -181,8 +188,6 @@ namespace eduProjectDesktop.Data
                     }
                 }
             }
-
-
         }
     }
 }

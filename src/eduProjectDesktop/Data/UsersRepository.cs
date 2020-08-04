@@ -8,23 +8,9 @@ namespace eduProjectDesktop.Data
 {
     public class UsersRepository
     {
-        public UsersRepository()
-        {
-
-        }
-
         public async Task<User> GetAsync(int id)
         {
-            User user = null;
-
-            using (MySqlConnection dbConnection = new MySqlConnection(Config.dbConnectionString))
-            {
-                await dbConnection.OpenAsync();
-
-                MySqlCommand command = new MySqlCommand();
-                command.Connection = dbConnection;
-
-                string commandText = @"SELECT user_id, user_account_type_id, first_name, last_name, phone_number, phone_format,
+            string commandText = @"SELECT user_id, user_account_type_id, first_name, last_name, phone_number, phone_format,
 	                                            student.study_year,
 	                                            faculty.name, faculty.address, study_program.name, study_program.cycle, study_program.duration_years,
 	                                            study_program_specialization.name,
@@ -43,76 +29,87 @@ namespace eduProjectDesktop.Data
 
                                       WHERE user.user_id = @id;";
 
-                command.CommandText = commandText;
-                command.Parameters.Add(new MySqlParameter { DbType = DbType.Int32, ParameterName = "@id", Value = id });
+            MySqlCommand command = new MySqlCommand
+            {
+                CommandText = commandText
+            };
+
+            command.Parameters.Add(new MySqlParameter
+            {
+                DbType = DbType.Int32,
+                ParameterName = "@id",
+                Value = id
+            });
+
+            User user = null;
+
+            using (MySqlConnection connection = new MySqlConnection(Config.dbConnectionString))
+            {
+                await connection.OpenAsync();
+                command.Connection = connection;
 
                 using (var reader = command.ExecuteReader())
                 {
                     if (reader.HasRows)
                     {
-                        while (reader.Read())
-                        {
-                            UserAccountType accountType = (UserAccountType)Enum.ToObject(typeof(UserAccountType), reader.GetInt32(1));
-
-                            if (accountType is UserAccountType.Student)
-                            {
-                                Student student = new Student();
-                                student.StudyYear = reader.GetInt32(6);
-
-                                // TODO: UCITATI CIJELU STRUKTURU FAKULTETA U API?
-                                // tagove necemo jer ih je puno? kako da se brzo searchaju?
-                                // sta da ih je milion? 
-                                // previse non DB work unutar zauzeca komunikacije?
-                                // faculty repository koji bi dohvatao fakultete iz baze samo ako ih nema u lokalnoj reprezentaciji?
-                                // nema boga da za tagovanje (i izbacivanje prijedloga tagova) aplikacija komunicira sa bazom....
-
-
-                                // necu zasad cijelu strukturu, nego sto treba
-                                // moze li rest api imati interni pool read only podataka koji dopunjava kako se obraca bazi?
-
-
-                                student.StudyProgram = new StudyProgram
-                                {
-                                    Name = reader.GetString(9),
-                                    Cycle = reader.GetByte(10),
-                                    DurationYears = reader.GetByte(11)
-                                };
-
-                                student.StudyProgramSpecialization = new StudyProgramSpecialization
-                                {
-                                    Name = reader.GetString(12)
-                                };
-
-                                user = student;
-                            }
-                            else if (accountType is UserAccountType.FacultyMember)
-                            {
-                                FacultyMember facultyMember = new FacultyMember();
-                                Faculty faculty = new Faculty
-                                {
-                                    Name = reader.GetString(7),
-                                    Address = reader.GetString(8)
-                                };
-                                facultyMember.AcademicRank = (AcademicRank)Enum.ToObject(typeof(AcademicRank), reader.GetInt32(13));
-                                facultyMember.StudyField = new StudyField
-                                {
-                                    Name = reader.GetString(14)
-                                };
-
-                                user = facultyMember;
-                            }
-
-                            user.UserId = reader.GetInt32(0);
-                            user.FirstName = reader.GetString(2);
-                            user.LastName = reader.GetString(3);
-                            user.PhoneNumber = !reader.IsDBNull(4) ? reader.GetString(4) : null;
-                            user.PhoneFormat = !reader.IsDBNull(4) ? reader.GetString(5) : null;
-                        }
+                        reader.Read();
+                        user = GetUserFromRow(reader);
                     }
                 }
 
-                await dbConnection.CloseAsync();
+                await connection.CloseAsync();
             }
+
+            return user;
+        }
+
+        private User GetUserFromRow(MySqlDataReader reader)
+        {
+            User user = new User();
+
+            UserAccountType accountType = (UserAccountType)Enum.ToObject(typeof(UserAccountType), reader.GetInt32(1));
+
+            if (accountType is UserAccountType.Student)
+            {
+                Student student = new Student();
+                student.StudyYear = reader.GetInt32(6);
+
+                student.StudyProgram = new StudyProgram
+                {
+                    Name = reader.GetString(9),
+                    Cycle = reader.GetByte(10),
+                    DurationYears = reader.GetByte(11)
+                };
+
+                student.StudyProgramSpecialization = new StudyProgramSpecialization
+                {
+                    Name = reader.GetString(12)
+                };
+
+                user = student;
+            }
+            else if (accountType is UserAccountType.FacultyMember)
+            {
+                FacultyMember facultyMember = new FacultyMember();
+                facultyMember.Faculty = new Faculty
+                {
+                    Name = reader.GetString(7),
+                    Address = reader.GetString(8)
+                };
+                facultyMember.AcademicRank = (AcademicRank)Enum.ToObject(typeof(AcademicRank), reader.GetInt32(13));
+                facultyMember.StudyField = new StudyField
+                {
+                    Name = reader.GetString(14)
+                };
+
+                user = facultyMember;
+            }
+
+            user.UserId = reader.GetInt32(0);
+            user.FirstName = reader.GetString(2);
+            user.LastName = reader.GetString(3);
+            user.PhoneNumber = !reader.IsDBNull(4) ? reader.GetString(4) : null;
+            user.PhoneFormat = !reader.IsDBNull(4) ? reader.GetString(5) : null;
 
             return user;
         }
