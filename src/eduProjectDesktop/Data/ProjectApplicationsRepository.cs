@@ -158,7 +158,7 @@ namespace eduProjectDesktop.Data
                                           project_application.user_id
                                    FROM project
                                    INNER JOIN collaborator_profile USING(project_id)
-                                   LEFT OUTER JOIN project_application USING(collaborator_profile_id)
+                                   INNER JOIN project_application USING(collaborator_profile_id)
                                    WHERE project.user_id = @id";
 
             MySqlCommand command = new MySqlCommand
@@ -177,6 +177,7 @@ namespace eduProjectDesktop.Data
 
             using (var connection = new MySqlConnection(Config.dbConnectionString))
             {
+                await connection.OpenAsync();
                 command.Connection = connection;
 
                 using (var reader = await command.ExecuteReaderAsync())
@@ -190,6 +191,7 @@ namespace eduProjectDesktop.Data
                         }
                     }
                 }
+                await connection.CloseAsync();
             }
 
             return applications;

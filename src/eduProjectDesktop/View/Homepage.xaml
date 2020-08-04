@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     xmlns:c="using:eduProjectDesktop.Model.Display"
-    xmlns:c1="using:eduProjectDesktop.Model.Domain"
+    xmlns:c1="using:eduProjectDesktop.Model.Domain" xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     Loaded="{x:Bind HomepageViewModel.LoadProjects}" d:DesignWidth="900">
 
@@ -20,16 +20,19 @@
             IsBackEnabled="True"
             BackRequested="{x:Bind HomepageViewModel.CloseProjectPage}"
             Header="{x:Bind HomepageViewModel.SectionName, Mode=OneWay}"
-            >
+            SelectionChanged="{x:Bind HomepageViewModel.MenuItemSelectionChanged}"
+            SelectedItem="{x:Bind HomepageViewModel.SelectedMenuItem, Mode=TwoWay}">
             <NavigationView.MenuItems>
                 <NavigationViewItem Content="Početna"/>
                 <NavigationViewItem Content="Svi projekti"/>
                 <NavigationViewItem Content="Moji projekti"/>
                 <NavigationViewItem Content="Moje prijave"/>
+                <NavigationViewItem Content="Pristigle prijave"/>
             </NavigationView.MenuItems>
             <StackPanel>
+                <!-- All projects -->
                 <ListView x:Name="ProjectsList" ItemsSource="{x:Bind HomepageViewModel.ProjectSnippets, Mode=OneWay}"
-                      Visibility="{x:Bind HomepageViewModel.IsHomepageVisible, Mode=OneWay}"
+                      Visibility="{x:Bind HomepageViewModel.Visibility.HomepageVisibility, Mode=OneWay}"
                       SelectionChanged="{x:Bind HomepageViewModel.ShowProjectPage}"
                       SelectedItem="{x:Bind HomepageViewModel.SelectedSnippet, Mode=TwoWay}"
                       SelectedIndex="{x:Bind HomepageViewModel.SelectedSnippetIndex, Mode=TwoWay}">
@@ -46,7 +49,8 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                <Grid Visibility="{x:Bind HomepageViewModel.IsProjectPageVisible, Mode=OneWay}" Width="850"
+                <!-- Project page -->
+                <Grid Visibility="{x:Bind HomepageViewModel.Visibility.ProjectPageVisibility, Mode=OneWay}" Width="850"
                       Margin="20">
                     <Grid.RowDefinitions>
                         <RowDefinition></RowDefinition>
@@ -197,6 +201,19 @@
 
                 </Grid>
 
+                <!-- Sent applications -->
+                <controls:DataGrid 
+                    Visibility="{x:Bind HomepageViewModel.Visibility.SentApplicationsVisibility, Mode=TwoWay}"
+                    AutoGenerateColumns="True"
+                    ItemsSource="{x:Bind MyApplicationsViewModel.SentApplications, Mode=TwoWay}">
+                </controls:DataGrid>
+
+                <!-- Received applications -->
+                <controls:DataGrid 
+                    Visibility="{x:Bind HomepageViewModel.Visibility.ReceivedApplicationVisibility, Mode=TwoWay}"
+                    AutoGenerateColumns="True"
+                    ItemsSource="{x:Bind ReceivedApplicationsViewModel.ReceivedApplications, Mode=TwoWay}">
+                </controls:DataGrid>
             </StackPanel>
         </NavigationView>
     </Grid>

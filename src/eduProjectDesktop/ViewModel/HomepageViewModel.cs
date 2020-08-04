@@ -14,44 +14,42 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
 namespace eduProjectDesktop.ViewModel
 {
     public class HomepageViewModel : INotifyPropertyChanged
     {
+        public VisibilityToggle Visibility { get; set; } = new VisibilityToggle();
+
         public ProjectPageViewModel ProjectPageViewModel { get; set; }
 
-        /*
-        private readonly static Dictionary<Tuple<bool, ProjectStatus>, Type> overviews
-            = new Dictionary<Tuple<bool, ProjectStatus>, Type>(new List<KeyValuePair<Tuple<bool, ProjectStatus>, Type>>
-            {
-                new KeyValuePair<Tuple<bool, ProjectStatus>, Type>(new Tuple<bool, ProjectStatus>(true, ProjectStatus.Active), typeof(ProjectOverview)),
-                new KeyValuePair<Tuple<bool, ProjectStatus>, Type>(new Tuple<bool, ProjectStatus>(true, ProjectStatus.Active), typeof(ProjectOverview))
-            });
-            */
+        public SentApplicationsViewModel SentApplicationsViewModel { get; set; }
+
+        public ReceivedApplicationsViewModel ReceivedApplicationsViewModel { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
         public string SectionName { get; set; } = "Sekcija";
+
         public ObservableCollection<ProjectSnippet> ProjectSnippets { get; set; } = new ObservableCollection<ProjectSnippet>();
 
         private int selectedSnippetIndex = -1;
+
         public int SelectedSnippetIndex { get { return selectedSnippetIndex; } set { selectedSnippetIndex = value; OnPropertyChanged(); } }
+
         public ProjectSnippet SelectedSnippet { get; set; }
 
-        private Visibility isHomePageVisible = Visibility.Visible;
-        public Visibility IsHomepageVisible { get { return isHomePageVisible; } set { isHomePageVisible = value; OnPropertyChanged(); } }
+        private object selectedMenuItem;
 
-        private Visibility isProjectPageVisible = Visibility.Collapsed;
-        public Visibility IsProjectPageVisible
-        {
-            get { return isProjectPageVisible; }
-            set { isProjectPageVisible = value; OnPropertyChanged(); }
-        }
+        public object SelectedMenuItem { get { return selectedMenuItem; } set { selectedMenuItem = value; OnPropertyChanged(); } }
+
         public HomepageViewModel()
         {
 
         }
-        public async void LoadProjects()
+
+        public async Task LoadProjects()
         {
             Project project = await ((App)App.Current).projects.GetAsync(1); // zasad samo jedan
             User author = await ((App)App.Current).users.GetAsync(project.AuthorId);
@@ -61,19 +59,25 @@ namespace eduProjectDesktop.ViewModel
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             () =>
             {
+                Visibility.ChangeVisibility(true, "Homepage");
+
+                ProjectSnippets.Clear();
                 ProjectSnippets.Add(snippet);
             });
         }
+
         public async void ShowProjectPage()
         {
+            // kad treba prikazati project page, u ovom view modelu se obradjuje event na nacin da se sakriju potrebna polja
+            // i posalje view modelu sta treba
+
             if (SelectedSnippet != null)
             {
 
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
                 () =>
                 {
-                    IsHomepageVisible = Visibility.Collapsed;
-                    IsProjectPageVisible = Visibility.Visible;
+                    Visibility.ChangeVisibility(true, "ProjectPage");
                 });
 
                 Project project = await ((App)App.Current).projects.GetAsync(SelectedSnippet.ProjectId);
@@ -92,16 +96,72 @@ namespace eduProjectDesktop.ViewModel
                 });
             }
         }
+
         public async void CloseProjectPage()
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             () =>
             {
-                IsHomepageVisible = Visibility.Visible;
-                IsProjectPageVisible = Visibility.Collapsed;
+                Visibility.ChangeVisibility(true, "Homepage");
                 SelectedSnippetIndex = -1;  // TwoWay bound, so this will clear list item selection
             });
         }
+
+        public async void MenuItemSelectionChanged()
+        {
+            if (SelectedMenuItem != null)
+            {
+                string content = (string)((NavigationViewItem)SelectedMenuItem).Content;
+                switch (content)
+                {
+                    case "Moje prijave":
+                        {
+                            await DisplaySentApplicationsAsync();
+                            break;
+                        }
+                    case "Početna":
+                        {
+                            await LoadProjects();
+                            break;
+                        }
+                    case "Svi projekti":
+                        {
+                            break;
+                        }
+                    case "Moji projekti":
+                        {
+                            break;
+                        }
+                    case "Pristigle prijave":
+                        {
+                            await DisplayReceivedApplicationsAsync();
+                            break;
+                        }
+                }
+            }
+        }
+
+        private async Task DisplaySentApplicationsAsync()
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            async () =>
+            {
+                Visibility.ChangeVisibility(true, "SentApplications");
+                await SentApplicationsViewModel.LoadSentApplications();
+            });
+        }
+
+        private async Task DisplayReceivedApplicationsAsync()
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            async () =>
+            {
+                Visibility.ChangeVisibility(true, "ReceivedApplications");
+                await ReceivedApplicationsViewModel.LoadReceivedApplicationsAsync();
+            });
+        }
+
+
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

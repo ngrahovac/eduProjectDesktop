@@ -161,7 +161,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\HomepageViewModel.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
+    <Compile Include="ViewModel\SentApplicationsViewModel.cs" />
     <Compile Include="ViewModel\ProjectPageViewModel.cs" />
+    <Compile Include="ViewModel\ReceivedApplicationsViewModel.cs" />
+    <Compile Include="ViewModel\VisibilityToggle.cs" />
     <Compile Include="View\Homepage.xaml.cs">
       <DependentUpon>Homepage.xaml</DependentUpon>
     </Compile>
@@ -207,6 +210,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.10</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.DataGrid">
+      <Version>7.0.0-preview1</Version>
     </PackageReference>
     <PackageReference Include="MySqlConnector">
       <Version>1.0.0</Version>

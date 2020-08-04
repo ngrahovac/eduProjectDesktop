@@ -23,12 +23,20 @@ namespace eduProjectDesktop.View
         public HomepageViewModel HomepageViewModel { get; set; }
 
         public ProjectPageViewModel ProjectPageViewModel { get; set; }
+
+        public SentApplicationsViewModel MyApplicationsViewModel { get; set; }
+
+        public ReceivedApplicationsViewModel ReceivedApplicationsViewModel { get; set; }
         public Homepage()
         {
             this.InitializeComponent();
             HomepageViewModel = new HomepageViewModel();
             ProjectPageViewModel = new ProjectPageViewModel();
             HomepageViewModel.ProjectPageViewModel = ProjectPageViewModel;
+            MyApplicationsViewModel = new SentApplicationsViewModel();
+            HomepageViewModel.SentApplicationsViewModel = MyApplicationsViewModel;
+            ReceivedApplicationsViewModel = new ReceivedApplicationsViewModel();
+            HomepageViewModel.ReceivedApplicationsViewModel = ReceivedApplicationsViewModel;
         }
     }
 }
