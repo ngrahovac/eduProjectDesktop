@@ -157,6 +157,7 @@ namespace eduProjectDesktop.ViewModel
             {
                 Visibility.ChangeVisibility(true, "ReceivedApplications");
                 await ReceivedApplicationsViewModel.LoadReceivedApplicationsAsync();
+                await ReceivedApplicationsViewModel.SetControlsVisibilityAsync();
             });
         }
 

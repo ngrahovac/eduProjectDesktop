@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
+using Windows.UI.Xaml;
 
 namespace eduProjectDesktop.ViewModel
 {
@@ -17,6 +18,34 @@ namespace eduProjectDesktop.ViewModel
         private ObservableCollection<ProjectApplication> receivedApplications;
         public ObservableCollection<ProjectApplication> ReceivedApplications { get { return receivedApplications; } set { receivedApplications = value; OnPropertyChanged(); } }
 
+        public ProjectApplication SelectedApplication { get; set; }
+
+        private Visibility acceptApplicationButtonVisibility = Visibility.Collapsed;
+
+        public Visibility AcceptApplicationButtonVisibility
+        {
+            get { return acceptApplicationButtonVisibility; }
+
+            set
+            {
+                acceptApplicationButtonVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Visibility rejectApplicationButtonVisibility = Visibility.Collapsed;
+
+        public Visibility RejectApplicationButtonVisibility
+        {
+            get { return rejectApplicationButtonVisibility; }
+
+            set
+            {
+                rejectApplicationButtonVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public async Task LoadReceivedApplicationsAsync()
@@ -24,8 +53,38 @@ namespace eduProjectDesktop.ViewModel
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             async () =>
             {
-                ReceivedApplications = new ObservableCollection<ProjectApplication>(await ((App)App.Current).applications.GetAllByAuthorAsync(9));
+                ReceivedApplications = new ObservableCollection<ProjectApplication>(await ((App)App.Current).applications.GetAllOnHoldByAuthorAsync(9));
             });
+        }
+
+        public async Task SetControlsVisibilityAsync()
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                // ako je projekat zatvoren, ne mozemo editovati?
+                AcceptApplicationButtonVisibility = Visibility.Visible;
+                AcceptApplicationButtonVisibility = Visibility.Visible;
+            });
+        }
+
+        public async Task AcceptApplicationAsync()
+        {
+            if (SelectedApplication != null)
+            {
+                SelectedApplication.ProjectApplicationStatus = ProjectApplicationStatus.Accepted;
+                await ((App)App.Current).applications.UpdateAsync(SelectedApplication);
+            }
+
+        }
+
+        public async Task RejectApplicationAsync()
+        {
+            if (SelectedApplication != null)
+            {
+                SelectedApplication.ProjectApplicationStatus = ProjectApplicationStatus.Rejected;
+                await ((App)App.Current).applications.UpdateAsync(SelectedApplication);
+            }
         }
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)

@@ -148,6 +148,62 @@ namespace eduProjectDesktop.Data
             return applications;
         }
 
+        public async Task<IEnumerable<ProjectApplication>> GetAllOnHoldByAuthorAsync(int id)
+        {
+            string commandText = @"SELECT project_application_id,
+		                                  applicant_comment,
+                                          author_comment,
+                                          project_application_status_id,
+                                          project_application.collaborator_profile_id,
+                                          project_application.user_id
+                                   FROM project
+                                   INNER JOIN collaborator_profile USING(project_id)
+                                   INNER JOIN project_application USING(collaborator_profile_id)
+                                   WHERE project.user_id = @id AND project_application_status_id = @onHoldStatusId";
+
+            MySqlCommand command = new MySqlCommand
+            {
+                CommandText = commandText
+            };
+
+            command.Parameters.Add(new MySqlParameter
+            {
+                DbType = DbType.Int32,
+                ParameterName = "@id",
+                Value = id
+            });
+
+            command.Parameters.Add(new MySqlParameter
+            {
+                DbType = DbType.Int32,
+                ParameterName = "@onHoldStatusId",
+                Value = (int)ProjectApplicationStatus.OnHold
+            });
+
+            List<ProjectApplication> applications = new List<ProjectApplication>();
+
+            using (var connection = new MySqlConnection(Config.dbConnectionString))
+            {
+                await connection.OpenAsync();
+                command.Connection = connection;
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            ProjectApplication application = GetProjectApplicationFromRow(reader);
+                            applications.Add(application);
+                        }
+                    }
+                }
+                await connection.CloseAsync();
+            }
+
+            return applications;
+        }
+
         public async Task AddAsync(ProjectApplication application)
         {
             string applicantComment = application.ApplicantComment;
@@ -201,10 +257,10 @@ namespace eduProjectDesktop.Data
         {
             string commandText = @"UPDATE project_application
                                    SET
-                                   applicant_comment = @applicant_comment,
-                                   author_comment = @author_comment
-                                   project_application_status_id = @status_id
-                                   WHERE project_application_id = @application_id";
+                                   applicant_comment = @applicantComment,
+                                   author_comment = @authorComment,
+                                   project_application_status_id = @statusId
+                                   WHERE project_application_id = @applicationId";
 
             MySqlCommand command = new MySqlCommand
             {
@@ -214,22 +270,29 @@ namespace eduProjectDesktop.Data
             command.Parameters.Add(new MySqlParameter
             {
                 DbType = DbType.String,
-                ParameterName = "@applicant_comment",
+                ParameterName = "@applicantComment",
                 Value = application.ApplicantComment
             });
 
             command.Parameters.Add(new MySqlParameter
             {
                 DbType = DbType.String,
-                ParameterName = "@author_comment",
+                ParameterName = "@authorComment",
                 Value = application.AuthorComment
             });
 
             command.Parameters.Add(new MySqlParameter
             {
-                DbType = DbType.String,
-                ParameterName = "@project_application_status_id",
+                DbType = DbType.Int32,
+                ParameterName = "@statusId",
                 Value = (int)application.ProjectApplicationStatus
+            });
+
+            command.Parameters.Add(new MySqlParameter
+            {
+                DbType = DbType.Int32,
+                ParameterName = "@applicationId",
+                Value = application.ProjectApplicationId
             });
 
             using (var connection = new MySqlConnection(Config.dbConnectionString))

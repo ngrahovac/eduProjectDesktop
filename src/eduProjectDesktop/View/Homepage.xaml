@@ -359,11 +359,23 @@
                 </controls:DataGrid>
 
                 <!-- Received applications -->
-                <controls:DataGrid 
-                    Visibility="{x:Bind HomepageViewModel.Visibility.ReceivedApplicationsVisibility, Mode=TwoWay}"
+                <StackPanel
+                    Visibility="{x:Bind HomepageViewModel.Visibility.ReceivedApplicationsVisibility, Mode=TwoWay}">
+                    <controls:DataGrid                    
                     AutoGenerateColumns="True"
-                    ItemsSource="{x:Bind ReceivedApplicationsViewModel.ReceivedApplications, Mode=TwoWay}">
-                </controls:DataGrid>
+                    ItemsSource="{x:Bind ReceivedApplicationsViewModel.ReceivedApplications, Mode=TwoWay}"
+                    SelectedItem="{x:Bind ReceivedApplicationsViewModel.SelectedApplication, Mode=TwoWay}">
+                    </controls:DataGrid>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Margin="5"
+                            Visibility="{x:Bind ReceivedApplicationsViewModel.AcceptApplicationButtonVisibility, Mode=TwoWay}"
+                            Click="{x:Bind ReceivedApplicationsViewModel.AcceptApplicationAsync}">Prihvati</Button>
+                        <Button Margin="5"
+                            Visibility="{x:Bind ReceivedApplicationsViewModel.RejectApplicationButtonVisibility, Mode=TwoWay}"
+                            Click="{x:Bind ReceivedApplicationsViewModel.RejectApplicationAsync}">Odbij</Button>
+
+                    </StackPanel>
+                </StackPanel>
             </StackPanel>
         </NavigationView>
     </Grid>

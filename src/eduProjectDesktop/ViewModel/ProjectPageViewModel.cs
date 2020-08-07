@@ -173,7 +173,7 @@ namespace eduProjectDesktop.ViewModel
         public async Task SetSelectedProject(int id)
         {
             SelectedProject = await ((App)App.Current).projects.GetAsync(id);
-            SetControlsVisibility();
+            SetControlsVisibilityAsync();
 
             User user = await ((App)App.Current).users.GetAsync(SelectedProject.AuthorId);
             ProjectStatus status = SelectedProject.ProjectStatus;
@@ -199,35 +199,40 @@ namespace eduProjectDesktop.ViewModel
         }
 
         // sets initial button visibility
-        private void SetControlsVisibility()
+        private async void SetControlsVisibilityAsync()
         {
-            if (SelectedProject.ProjectStatus == ProjectStatus.Active)
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
             {
-                if (SelectedProject.AuthorId == User.CurrentUserId)
+                if (SelectedProject.ProjectStatus == ProjectStatus.Active)
                 {
-                    EditButtonVisibility = Visibility.Visible;
-                    DeleteButtonVisibility = Visibility.Visible;
-                    SaveButtonVisibility = Visibility.Visible;
-                    CancelButtonVisibility = Visibility.Visible;
-                    CloseProjectButtonVisibility = Visibility.Visible;
+                    if (SelectedProject.AuthorId == User.CurrentUserId)
+                    {
+                        EditButtonVisibility = Visibility.Visible;
+                        DeleteButtonVisibility = Visibility.Visible;
+                        SaveButtonVisibility = Visibility.Visible;
+                        CancelButtonVisibility = Visibility.Visible;
+                        CloseProjectButtonVisibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        ApplyButtonVisibility = Visibility.Visible;
+                        RevokeButtonVisibility = Visibility.Visible;
+                    }
                 }
-                else
+                else if (SelectedProject.ProjectStatus == ProjectStatus.Closed)
                 {
-                    ApplyButtonVisibility = Visibility.Visible;
-                    RevokeButtonVisibility = Visibility.Visible;
-                }
-            }
-            else if (SelectedProject.ProjectStatus == ProjectStatus.Closed)
-            {
-                if (SelectedProject.AuthorId == User.CurrentUserId)
-                {
-                    DeleteButtonVisibility = Visibility.Visible;
-                }
-                else
-                {
+                    if (SelectedProject.AuthorId == User.CurrentUserId)
+                    {
+                        DeleteButtonVisibility = Visibility.Visible;
+                    }
+                    else
+                    {
 
+                    }
                 }
-            }
+            });
+
         }
 
         // selected student or faculty member profile are bound to this property
