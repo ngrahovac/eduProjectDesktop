@@ -194,9 +194,7 @@
                         <!-- Active project page controls -->
                         <Button
                                 Visibility="{x:Bind ProjectPageViewModel.EditButtonVisibility, Mode=TwoWay}" Grid.ColumnSpan="2" Margin="700,0,0,0" Width="150"
-                                Click="{x:Bind ProjectPageViewModel.EditProjectAsync}"    
-                            >
-
+                                Click="{x:Bind ProjectPageViewModel.EditProjectAsync}">
                             Izmijeni projekat</Button>
 
                         <StackPanel Orientation="Horizontal"                                 

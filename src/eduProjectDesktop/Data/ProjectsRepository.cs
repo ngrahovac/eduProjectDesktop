@@ -33,6 +33,59 @@ namespace eduProjectDesktop.Data
             return project;
         }
 
+        public async Task<Project> GetByCollaboratorProfileAsync(int collaboratorProfileId)
+        {
+            Project project = new Project();
+
+            using (MySqlConnection connection = new MySqlConnection(Config.dbConnectionString))
+            {
+                await connection.OpenAsync();
+                MySqlCommand command = new MySqlCommand
+                {
+                    Connection = connection
+                };
+
+                int id = await GetProjectIdByCollaboratorProfile(command, collaboratorProfileId);
+
+                await ReadBasicProjectInfo(command, id, project);
+                await ReadCollaboratorProfilesInfo(command, id, project);
+                await ReadTagsInfo(command, id, project);
+                await ReadCollaboratorIds(command, id, project);
+
+                await connection.CloseAsync();
+            }
+
+            return project;
+        }
+
+        private async Task<int> GetProjectIdByCollaboratorProfile(MySqlCommand command, int id)
+        {
+            int projectId = -1;
+
+            string commandText = @"SELECT project_id FROM collaborator_profile WHERE collaborator_profile_id = @id";
+            command.CommandText = commandText;
+
+            command.Parameters.Clear();
+
+            command.Parameters.Add(new MySqlParameter
+            {
+                DbType = DbType.Int32,
+                ParameterName = "@id",
+                Value = id
+            });
+
+            using (var reader = await command.ExecuteReaderAsync())
+            {
+                if (reader.HasRows)
+                {
+                    await reader.ReadAsync();
+                    projectId = reader.GetInt32(0);
+                }
+            }
+
+            return projectId;
+        }
+
         public async Task<IEnumerable<Project>> GetAllAsync()
         {
             List<Project> projects = new List<Project>();
@@ -520,7 +573,7 @@ namespace eduProjectDesktop.Data
                 await UpdateBasicProjectInfo(command, project);
                 // await UpdateCollaboratorProfiles(command, project);
                 // await UpdateProjectTags(command, project);
-                // await UpdateCollaboratorIds(command, project);
+                await UpdateCollaboratorIds(command, project);
 
                 await connection.CloseAsync();
             }
@@ -624,6 +677,36 @@ namespace eduProjectDesktop.Data
             */
         }
 
+        private async Task UpdateCollaboratorIds(MySqlCommand command, Project project)
+        {
+            string commandText = @"INSERT INTO project_collaborator
+                                   (project_id, user_id)
+                                   VALUES
+                                   (@projectId, @userId)";
+
+            command.CommandText = commandText;
+
+            foreach (int id in project.CollaboratorIds)
+            {
+                command.Parameters.Clear();
+
+                command.Parameters.Add(new MySqlParameter
+                {
+                    DbType = DbType.Int32,
+                    ParameterName = "@projectId",
+                    Value = project.ProjectId
+                });
+
+                command.Parameters.Add(new MySqlParameter
+                {
+                    DbType = DbType.Int32,
+                    ParameterName = "@userId",
+                    Value = id
+                });
+
+                await command.ExecuteNonQueryAsync();
+            }
+        }
 
     }
 }

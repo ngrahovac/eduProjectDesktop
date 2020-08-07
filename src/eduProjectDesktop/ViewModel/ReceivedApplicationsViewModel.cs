@@ -64,7 +64,7 @@ namespace eduProjectDesktop.ViewModel
             {
                 // ako je projekat zatvoren, ne mozemo editovati?
                 AcceptApplicationButtonVisibility = Visibility.Visible;
-                AcceptApplicationButtonVisibility = Visibility.Visible;
+                RejectApplicationButtonVisibility = Visibility.Visible;
             });
         }
 
@@ -74,7 +74,16 @@ namespace eduProjectDesktop.ViewModel
             {
                 SelectedApplication.ProjectApplicationStatus = ProjectApplicationStatus.Accepted;
                 await ((App)App.Current).applications.UpdateAsync(SelectedApplication);
+
+                // registering collaborator
+
+                Project project = await ((App)App.Current).projects.GetByCollaboratorProfileAsync(SelectedApplication.CollaboratorProfileId);
+                project.AddCollaboratorId(SelectedApplication.ApplicantId);
+
+                await ((App)App.Current).projects.UpdateAsync(project);
             }
+
+
 
         }
 

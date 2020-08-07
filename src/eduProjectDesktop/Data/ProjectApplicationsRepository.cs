@@ -307,32 +307,37 @@ namespace eduProjectDesktop.Data
 
         }
 
-        public async Task RemoveAsync(int id)
+        public async Task RemoveAsync(ProjectApplication application)
         {
-            string commandText = @"DELETE
+            if (application.ApplicantId == User.CurrentUserId)
+            {
+                int id = application.ProjectApplicationId;
+
+                string commandText = @"DELETE
                                    FROM project_application
                                    WHERE project_application_id = @id";
 
-            MySqlCommand command = new MySqlCommand
-            {
-                CommandText = commandText
-            };
+                MySqlCommand command = new MySqlCommand
+                {
+                    CommandText = commandText
+                };
 
-            command.Parameters.Add(new MySqlParameter
-            {
-                DbType = DbType.Int32,
-                ParameterName = "@id",
-                Value = id
-            });
+                command.Parameters.Add(new MySqlParameter
+                {
+                    DbType = DbType.Int32,
+                    ParameterName = "@id",
+                    Value = id
+                });
 
-            using (var connection = new MySqlConnection(Config.dbConnectionString))
-            {
-                await connection.OpenAsync();
-                command.Connection = connection;
+                using (var connection = new MySqlConnection(Config.dbConnectionString))
+                {
+                    await connection.OpenAsync();
+                    command.Connection = connection;
 
-                await command.ExecuteNonQueryAsync();
+                    await command.ExecuteNonQueryAsync();
 
-                await connection.CloseAsync();
+                    await connection.CloseAsync();
+                }
             }
         }
 
@@ -345,7 +350,7 @@ namespace eduProjectDesktop.Data
                 AuthorComment = !reader.IsDBNull(2) ? reader.GetString(2) : null,
                 ProjectApplicationStatus = (ProjectApplicationStatus)Enum.ToObject(typeof(ProjectApplicationStatus), reader.GetInt32(3)),
                 CollaboratorProfileId = reader.GetInt32(4),
-                ApplicantId = reader.GetInt32(4)
+                ApplicantId = reader.GetInt32(5)
             };
         }
 

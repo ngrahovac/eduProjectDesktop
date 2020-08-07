@@ -278,10 +278,7 @@ namespace eduProjectDesktop.ViewModel
             else if (SelectedStudentProfileOverview != null)
                 profile = SelectedStudentProfileOverview;
 
-
-            if (profile == null)
-                throw new NotImplementedException();
-            else
+            if (profile != null)
             {
                 ProjectApplication application = new ProjectApplication
                 {
@@ -301,14 +298,45 @@ namespace eduProjectDesktop.ViewModel
 
                 }
 
-                await ((App)App.Current).applications.AddAsync(application);
+                Project project = await ((App)App.Current).projects.GetByCollaboratorProfileAsync(application.CollaboratorProfileId);
+                if (project.ProjectStatus != ProjectStatus.Closed)
+                {
+                    await ((App)App.Current).applications.AddAsync(application);
+                }
             }
         }
 
-
-        public void RevokeApplication()
+        public async Task RevokeApplicationAsync()
         {
-            throw new NotImplementedException();
+            CollaboratorProfileOverview profile = null;
+
+            if (SelectedFacultyMemberProfileOverview != null)
+                profile = SelectedFacultyMemberProfileOverview;
+            else if (SelectedStudentProfileOverview != null)
+                profile = SelectedStudentProfileOverview;
+
+
+            if (profile != null)
+
+            {
+                ProjectApplication application = new ProjectApplication
+                {
+                    ApplicantId = User.CurrentUserId,
+                    ApplicantComment = ""
+                };
+
+                if (selectedFacultyMemberProfileIndex != -1)
+                {
+                    application.CollaboratorProfileId = SelectedProject.CollaboratorProfiles.Where(p => p is FacultyMemberProfile).ElementAt(selectedFacultyMemberProfileIndex).CollaboratorProfileId;
+
+                }
+                else if (selectedStudentProfileIndex != -1)
+                {
+                    application.CollaboratorProfileId = SelectedProject.CollaboratorProfiles.Where(p => p is StudentProfile).ElementAt(selectedStudentProfileIndex).CollaboratorProfileId;
+                }
+
+                await ((App)App.Current).applications.RemoveAsync(application);
+            }
         }
 
         public async void StudentProfileSelected()
