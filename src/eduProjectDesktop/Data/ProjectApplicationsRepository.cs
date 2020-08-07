@@ -12,6 +12,142 @@ namespace eduProjectDesktop.Data
 {
     public class ProjectApplicationsRepository
     {
+        public async Task<IEnumerable<ProjectApplication>> GetAllByUserAsync(int id)
+        {
+            string commandText = @"SELECT *
+                                   FROM project_application
+                                   WHERE user_id = @id";
+
+            MySqlCommand command = new MySqlCommand
+            {
+                CommandText = commandText
+            };
+
+            command.Parameters.Add(new MySqlParameter
+            {
+                DbType = DbType.Int32,
+                ParameterName = "@id",
+                Value = id
+            });
+
+            List<ProjectApplication> applications = new List<ProjectApplication>();
+
+            using (MySqlConnection connection = new MySqlConnection(Config.dbConnectionString))
+            {
+                await connection.OpenAsync();
+                command.Connection = connection;
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            ProjectApplication application = GetProjectApplicationFromRow(reader);
+                            applications.Add(application);
+                        }
+                    }
+                }
+
+                await connection.CloseAsync();
+            }
+
+            return applications;
+
+        }
+
+        public async Task<IEnumerable<ProjectApplication>> GetAllByCollaboratorProfileAsync(int id)
+        {
+            string commandText = @"SELECT *
+                                   FROM project_application
+                                   WHERE collaborator_profile_id = @id";
+
+            MySqlCommand command = new MySqlCommand
+            {
+                CommandText = commandText
+            };
+
+            command.Parameters.Add(new MySqlParameter
+            {
+                DbType = DbType.Int32,
+                ParameterName = "@id",
+                Value = id
+            });
+
+            List<ProjectApplication> applications = new List<ProjectApplication>();
+
+            using (MySqlConnection connection = new MySqlConnection(Config.dbConnectionString))
+            {
+                await connection.OpenAsync();
+                command.Connection = connection;
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            ProjectApplication application = GetProjectApplicationFromRow(reader);
+                            applications.Add(application);
+                        }
+                    }
+                }
+
+                await connection.CloseAsync();
+            }
+
+            return applications;
+        }
+
+        public async Task<IEnumerable<ProjectApplication>> GetAllByAuthorAsync(int id)
+        {
+            string commandText = @"SELECT project_application_id,
+		                                  applicant_comment,
+                                          author_comment,
+                                          project_application_status_id,
+                                          project_application.collaborator_profile_id,
+                                          project_application.user_id
+                                   FROM project
+                                   INNER JOIN collaborator_profile USING(project_id)
+                                   INNER JOIN project_application USING(collaborator_profile_id)
+                                   WHERE project.user_id = @id";
+
+            MySqlCommand command = new MySqlCommand
+            {
+                CommandText = commandText
+            };
+
+            command.Parameters.Add(new MySqlParameter
+            {
+                DbType = DbType.Int32,
+                ParameterName = "@id",
+                Value = id
+            });
+
+            List<ProjectApplication> applications = new List<ProjectApplication>();
+
+            using (var connection = new MySqlConnection(Config.dbConnectionString))
+            {
+                await connection.OpenAsync();
+                command.Connection = connection;
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            ProjectApplication application = GetProjectApplicationFromRow(reader);
+                            applications.Add(application);
+                        }
+                    }
+                }
+                await connection.CloseAsync();
+            }
+
+            return applications;
+        }
+
         public async Task AddAsync(ProjectApplication application)
         {
             string applicantComment = application.ApplicantComment;
@@ -61,11 +197,14 @@ namespace eduProjectDesktop.Data
             }
         }
 
-        public async Task<IEnumerable<ProjectApplication>> GetByUserAsync(int id)
+        public async Task UpdateAsync(ProjectApplication application)
         {
-            string commandText = @"SELECT *
-                                   FROM project_application
-                                   WHERE user_id = @id";
+            string commandText = @"UPDATE project_application
+                                   SET
+                                   applicant_comment = @applicant_comment,
+                                   author_comment = @author_comment
+                                   project_application_status_id = @status_id
+                                   WHERE project_application_id = @application_id";
 
             MySqlCommand command = new MySqlCommand
             {
@@ -74,127 +213,64 @@ namespace eduProjectDesktop.Data
 
             command.Parameters.Add(new MySqlParameter
             {
-                DbType = DbType.Int32,
-                ParameterName = "@id",
-                Value = id
+                DbType = DbType.String,
+                ParameterName = "@applicant_comment",
+                Value = application.ApplicantComment
             });
-
-            List<ProjectApplication> applications = new List<ProjectApplication>();
-
-            using (MySqlConnection connection = new MySqlConnection(Config.dbConnectionString))
-            {
-                await connection.OpenAsync();
-                command.Connection = connection;
-
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    if (reader.HasRows)
-                    {
-                        while (reader.Read())
-                        {
-                            ProjectApplication application = GetProjectApplicationFromRow(reader);
-                            applications.Add(application);
-                        }
-                    }
-                }
-
-                await connection.CloseAsync();
-            }
-
-            return applications;
-
-        }
-
-        public async Task<IEnumerable<ProjectApplication>> GetByCollaboratorProfileAsync(int id)
-        {
-            string commandText = @"SELECT *
-                                   FROM project_application
-                                   WHERE collaborator_profile_id = @id";
-
-            MySqlCommand command = new MySqlCommand
-            {
-                CommandText = commandText
-            };
 
             command.Parameters.Add(new MySqlParameter
             {
-                DbType = DbType.Int32,
-                ParameterName = "@id",
-                Value = id
+                DbType = DbType.String,
+                ParameterName = "@author_comment",
+                Value = application.AuthorComment
             });
-
-            List<ProjectApplication> applications = new List<ProjectApplication>();
-
-            using (MySqlConnection connection = new MySqlConnection(Config.dbConnectionString))
-            {
-                await connection.OpenAsync();
-                command.Connection = connection;
-
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    if (reader.HasRows)
-                    {
-                        while (reader.Read())
-                        {
-                            ProjectApplication application = GetProjectApplicationFromRow(reader);
-                            applications.Add(application);
-                        }
-                    }
-                }
-
-                await connection.CloseAsync();
-            }
-
-            return applications;
-        }
-
-        public async Task<IEnumerable<ProjectApplication>> GetByAuthorAsync(int id)
-        {
-            string commandText = @"SELECT project_application_id,
-		                                  applicant_comment,
-                                          author_comment,
-                                          project_application_status_id,
-                                          project_application.collaborator_profile_id,
-                                          project_application.user_id
-                                   FROM project
-                                   INNER JOIN collaborator_profile USING(project_id)
-                                   INNER JOIN project_application USING(collaborator_profile_id)
-                                   WHERE project.user_id = @id";
-
-            MySqlCommand command = new MySqlCommand
-            {
-                CommandText = commandText
-            };
 
             command.Parameters.Add(new MySqlParameter
             {
-                DbType = DbType.Int32,
-                ParameterName = "@id",
-                Value = id
+                DbType = DbType.String,
+                ParameterName = "@project_application_status_id",
+                Value = (int)application.ProjectApplicationStatus
             });
-
-            List<ProjectApplication> applications = new List<ProjectApplication>();
 
             using (var connection = new MySqlConnection(Config.dbConnectionString))
             {
                 await connection.OpenAsync();
                 command.Connection = connection;
 
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    if (reader.HasRows)
-                    {
-                        while (reader.Read())
-                        {
-                            ProjectApplication application = GetProjectApplicationFromRow(reader);
-                            applications.Add(application);
-                        }
-                    }
-                }
+                await command.ExecuteNonQueryAsync();
+
                 await connection.CloseAsync();
             }
 
-            return applications;
+        }
+
+        public async Task RemoveAsync(int id)
+        {
+            string commandText = @"DELETE
+                                   FROM project_application
+                                   WHERE project_application_id = @id";
+
+            MySqlCommand command = new MySqlCommand
+            {
+                CommandText = commandText
+            };
+
+            command.Parameters.Add(new MySqlParameter
+            {
+                DbType = DbType.Int32,
+                ParameterName = "@id",
+                Value = id
+            });
+
+            using (var connection = new MySqlConnection(Config.dbConnectionString))
+            {
+                await connection.OpenAsync();
+                command.Connection = connection;
+
+                await command.ExecuteNonQueryAsync();
+
+                await connection.CloseAsync();
+            }
         }
 
         private ProjectApplication GetProjectApplicationFromRow(MySqlDataReader reader)
