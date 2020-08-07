@@ -37,7 +37,7 @@ namespace eduProjectDesktop.ViewModel
 
         private Visibility receivedApplicationsVisibility = Visibility.Collapsed;
 
-        public Visibility ReceivedApplicationVisibility { get { return receivedApplicationsVisibility; } set { receivedApplicationsVisibility = value; OnPropertyChanged(); } }
+        public Visibility ReceivedApplicationsVisibility { get { return receivedApplicationsVisibility; } set { receivedApplicationsVisibility = value; OnPropertyChanged(); } }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -50,7 +50,7 @@ namespace eduProjectDesktop.ViewModel
                         SentApplicationsVisibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
                         HomepageVisibility = Visibility.Collapsed;
                         ProjectPageVisibility = Visibility.Collapsed;
-                        ReceivedApplicationVisibility = Visibility.Collapsed;
+                        ReceivedApplicationsVisibility = Visibility.Collapsed;
 
                         break;
                     }
@@ -58,6 +58,7 @@ namespace eduProjectDesktop.ViewModel
                     {
                         HomepageVisibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
                         SentApplicationsVisibility = Visibility.Collapsed;
+                        ReceivedApplicationsVisibility = Visibility.Collapsed;
                         ProjectPageVisibility = Visibility.Collapsed;
 
                         break;
@@ -66,13 +67,14 @@ namespace eduProjectDesktop.ViewModel
                     {
                         ProjectPageVisibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
                         SentApplicationsVisibility = Visibility.Collapsed;
+                        ReceivedApplicationsVisibility = Visibility.Collapsed;
                         HomepageVisibility = Visibility.Collapsed;
 
                         break;
                     }
                 case "ReceivedApplications":
                     {
-                        ReceivedApplicationVisibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
+                        ReceivedApplicationsVisibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
                         HomepageVisibility = Visibility.Collapsed;
                         ProjectPageVisibility = Visibility.Collapsed;
                         SentApplicationsVisibility = Visibility.Collapsed;

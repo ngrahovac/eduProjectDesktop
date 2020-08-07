@@ -14,8 +14,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
-
 namespace eduProjectDesktop.View
 {
     public sealed partial class Homepage : Page
@@ -24,17 +22,20 @@ namespace eduProjectDesktop.View
 
         public ProjectPageViewModel ProjectPageViewModel { get; set; }
 
-        public SentApplicationsViewModel MyApplicationsViewModel { get; set; }
+        public SentApplicationsViewModel SentApplicationsViewModel { get; set; }
 
         public ReceivedApplicationsViewModel ReceivedApplicationsViewModel { get; set; }
         public Homepage()
         {
             this.InitializeComponent();
             HomepageViewModel = new HomepageViewModel();
+
             ProjectPageViewModel = new ProjectPageViewModel();
             HomepageViewModel.ProjectPageViewModel = ProjectPageViewModel;
-            MyApplicationsViewModel = new SentApplicationsViewModel();
-            HomepageViewModel.SentApplicationsViewModel = MyApplicationsViewModel;
+
+            SentApplicationsViewModel = new SentApplicationsViewModel();
+            HomepageViewModel.SentApplicationsViewModel = SentApplicationsViewModel;
+
             ReceivedApplicationsViewModel = new ReceivedApplicationsViewModel();
             HomepageViewModel.ReceivedApplicationsViewModel = ReceivedApplicationsViewModel;
         }

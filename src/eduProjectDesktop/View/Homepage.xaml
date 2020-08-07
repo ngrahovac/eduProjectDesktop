@@ -12,7 +12,6 @@
     Loaded="{x:Bind HomepageViewModel.LoadProjects}" d:DesignWidth="900">
 
     <Grid>
-        <!-- IsBackButtonVisible ne mozemo bind sa Visibility, skontati drugi nacin -->
         <NavigationView
             PaneDisplayMode="Top"
             IsSettingsVisible="False"     
@@ -49,168 +48,319 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                <!-- Project page -->
-                <Grid Visibility="{x:Bind HomepageViewModel.Visibility.ProjectPageVisibility, Mode=OneWay}" Width="850"
-                      Margin="20">
-                    <Grid.RowDefinitions>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="800"></ColumnDefinition>
-                        <ColumnDefinition Width="50"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
 
-                    <Grid x:Name="ProjectDetails"                      
-                          Margin="20,20,20,20"
-                          Grid.Row="1"
-                          Grid.Column="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="150" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                <!-- Project page -->
+                <StackPanel Visibility="{x:Bind HomepageViewModel.Visibility.ProjectPageVisibility, Mode=OneWay}">
+                    <!-- Active project overview -->
+                    <Grid Visibility="{x:Bind ProjectPageViewModel.ActiveProjectVisibility, Mode=OneWay}" Width="850"
+                      Margin="20">
                         <Grid.RowDefinitions>
                             <RowDefinition></RowDefinition>
                             <RowDefinition></RowDefinition>
                             <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="800"></ColumnDefinition>
+                            <ColumnDefinition Width="50"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid x:Name="ActiveProjectDetails"                      
+                          Margin="20,20,20,20"
+                          Grid.Row="1"
+                          Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Column="0"
+                               Grid.Row="0">ID</TextBlock>
+                            <TextBlock Grid.Column="1"
+                               Grid.Row="0"
+                               Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.ProjectId, Mode=OneWay}"></TextBlock>
+
+                            <TextBlock Grid.Column="0"
+                               Grid.Row="1">Status</TextBlock>
+                            <TextBlock Grid.Column="1"
+                               Grid.Row="1"
+                               Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.ProjectStatus, Mode=OneWay}"></TextBlock>
+
+                            <TextBlock Grid.Column="0"
+                               Grid.Row="2">Naziv</TextBlock>
+                            <TextBox Grid.Column="1"
+                               Grid.Row="2"
+                               Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.Title, Mode=TwoWay}"></TextBox>
+
+                            <TextBlock Grid.Column="0"
+                               Grid.Row="3">Opis</TextBlock>
+                            <TextBox Grid.Column="1"
+                               Grid.Row="3"
+                               Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.Description, Mode=TwoWay}"></TextBox>
+
+                            <TextBlock Grid.Column="0"
+                               Grid.Row="4">Autor</TextBlock>
+                            <TextBlock Grid.Column="1"
+                               Grid.Row="4"
+                               Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.AuthorFullName, Mode=OneWay}"></TextBlock>
+
+                            <TextBlock Grid.Column="0"
+                               Grid.Row="5">Naučna oblast</TextBlock>
+
+                            <TextBox Grid.Column="1"
+                               Grid.Row="5"                       
+                               Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.StudyField.Name, Mode=TwoWay}"></TextBox>
+
+                            <TextBlock Grid.Column="0"
+                               Grid.Row="6">Početak</TextBlock>
+                            <TextBox Grid.Column="1"
+                               Grid.Row="6"
+                               Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.StartDate, Mode=TwoWay}"></TextBox>
+
+                            <TextBlock Grid.Column="0"
+                               Grid.Row="7">Kraj</TextBlock>
+                            <TextBox Grid.Column="1"
+                               Grid.Row="7"
+                               Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.EndDate, Mode=TwoWay}"></TextBox>
+
+                            <TextBlock Grid.Column="0"
+                               Grid.Row="9">Profili studenata</TextBlock>
+                            <ListView Grid.Column="1"
+                              Grid.Row="9"
+                              ItemsSource="{x:Bind ProjectPageViewModel.ActiveProjectOverview.StudentProfileOverviews, Mode=TwoWay}"
+                              SelectionMode="Single"
+                              SelectionChanged="{x:Bind ProjectPageViewModel.StudentProfileSelected}"
+                              SelectedIndex="{x:Bind ProjectPageViewModel.SelectedStudentProfileIndex, Mode=TwoWay}"
+                              SelectedItem="{x:Bind ProjectPageViewModel.SelectedStudentProfileOverview, Mode=TwoWay}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="c:StudentProfileOverview">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{x:Bind FacultyName}"></TextBlock>
+                                            <TextBlock Text="{x:Bind StudyProgramName}"></TextBlock>
+                                            <TextBlock Text="{x:Bind StudyProgramSpecializationName}"></TextBlock>
+                                            <TextBlock Text="{x:Bind StudyCycle}"></TextBlock>
+                                            <TextBlock Text="{x:Bind StudyYear}"></TextBlock>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+
+                            <TextBlock Grid.Column="0"
+                               Grid.Row="10">Profili nastavnog osoblja</TextBlock>
+                            <ListView Grid.Column="1"
+                              Grid.Row="10"
+                              ItemsSource="{x:Bind ProjectPageViewModel.ActiveProjectOverview.FacultyMemberProfileOverviews, Mode=OneWay}"
+                              SelectionMode="Single"
+                              SelectionChanged="{x:Bind ProjectPageViewModel.FacultyMemberProfileSelected}"
+                              SelectedIndex="{x:Bind ProjectPageViewModel.SelectedFacultyMemberProfileIndex, Mode=TwoWay}"
+                              SelectedItem="{x:Bind ProjectPageViewModel.SelectedFacultyMemberProfileOverview, Mode=TwoWay}">
+
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="c:FacultyMemberProfileOverview">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{x:Bind FacultyName}"></TextBlock>
+                                            <TextBlock Text="{x:Bind StudyFieldName}"></TextBlock>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+
+                            </ListView>
+                            <TextBlock Grid.Column="0"
+                               Grid.Row="11">Tagovi</TextBlock>
+                            <GridView  Grid.Column="1"
+                              Grid.Row="11"
+                               ItemsSource="{x:Bind ProjectPageViewModel.ActiveProjectOverview.Tags, Mode=OneWay}">
+                                <GridView.ItemTemplate>
+                                    <DataTemplate x:DataType="c1:Tag">
+                                        <TextBlock Text="{x:Bind Name}"></TextBlock>
+                                    </DataTemplate>
+                                </GridView.ItemTemplate>
+
+
+                            </GridView>
+                        </Grid>
+                        <!-- Active project page controls -->
+                        <Button
+                                Visibility="{x:Bind ProjectPageViewModel.EditButtonVisibility, Mode=TwoWay}" Grid.ColumnSpan="2" Margin="700,0,0,0" Width="150"
+                                Click="{x:Bind ProjectPageViewModel.EditProjectAsync}"    
+                            >
+
+                            Izmijeni projekat</Button>
+
+                        <StackPanel Orientation="Horizontal"                                 
+                                Grid.Row="2"
+                            Grid.Column="0">
+                            <Button Margin="5"
+                                    Click="{x:Bind ProjectPageViewModel.ApplyForPosition}"
+                                    Visibility="{x:Bind ProjectPageViewModel.ApplyButtonVisibility, Mode=TwoWay}">Prijavi se</Button>
+                            <Button Margin="5"
+                                    Visibility="{x:Bind ProjectPageViewModel.RevokeButtonVisibility, Mode=TwoWay}">Odustani</Button>
+                            <Button Margin="5"
+                                    Visibility="{x:Bind ProjectPageViewModel.DeleteButtonVisibility, Mode=TwoWay}">Obriši projekat</Button>
+                            <Button Margin="5"
+                                    Visibility="{x:Bind ProjectPageViewModel.CloseProjectButtonVisibility, Mode=TwoWay}"
+                                    Click="{x:Bind ProjectPageViewModel.CloseProjectAsync}">Zatvori projekat</Button>
+                            <Button Margin="5"
+                                    Visibility="{x:Bind ProjectPageViewModel.SaveButtonVisibility, Mode=TwoWay}"
+                                    Click="{x:Bind ProjectPageViewModel.SaveChangesAsync}">Sačuvaj</Button>
+                            <Button Margin="5"
+                                    Visibility="{x:Bind ProjectPageViewModel.CancelButtonVisibility, Mode=TwoWay}"
+                                    Click="{x:Bind ProjectPageViewModel.CancelChangesAsync}">Odustani</Button>
+
+
+                        </StackPanel>
+
+                    </Grid>
+
+                    <!-- Closed project overview -->
+                    <Grid Visibility="{x:Bind ProjectPageViewModel.ClosedProjectVisibility, Mode=OneWay}" Width="850"
+                      Margin="20">
+                        <Grid.RowDefinitions>
                             <RowDefinition></RowDefinition>
                             <RowDefinition></RowDefinition>
                             <RowDefinition></RowDefinition>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Column="0"
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="800"></ColumnDefinition>
+                            <ColumnDefinition Width="50"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid x:Name="ClosedProjectDetails"                      
+                          Margin="20,20,20,20"
+                          Grid.Row="1"
+                          Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Column="0"
                                Grid.Row="0">ID</TextBlock>
-                        <TextBlock Grid.Column="1"
+                            <TextBlock Grid.Column="1"
                                Grid.Row="0"
-                               Text="{x:Bind ProjectPageViewModel.ProjectOverview.ProjectId, Mode=OneWay}"></TextBlock>
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.ProjectId, Mode=OneWay}"></TextBlock>
 
-                        <TextBlock Grid.Column="0"
+                            <TextBlock Grid.Column="0"
                                Grid.Row="1">Status</TextBlock>
-                        <TextBlock Grid.Column="1"
+                            <TextBlock Grid.Column="1"
                                Grid.Row="1"
-                               Text="{x:Bind ProjectPageViewModel.ProjectOverview.ProjectStatus, Mode=OneWay}"></TextBlock>
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.ProjectStatus, Mode=OneWay}"></TextBlock>
 
-                        <TextBlock Grid.Column="0"
+                            <TextBlock Grid.Column="0"
                                Grid.Row="2">Naziv</TextBlock>
-                        <TextBox Grid.Column="1"
+                            <TextBox Grid.Column="1"
                                Grid.Row="2"
-                               Text="{x:Bind ProjectPageViewModel.ProjectOverview.Title, Mode=TwoWay}"></TextBox>
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.Title, Mode=TwoWay}"></TextBox>
 
-                        <TextBlock Grid.Column="0"
+                            <TextBlock Grid.Column="0"
                                Grid.Row="3">Opis</TextBlock>
-                        <TextBox Grid.Column="1"
+                            <TextBox Grid.Column="1"
                                Grid.Row="3"
-                               Text="{x:Bind ProjectPageViewModel.ProjectOverview.Description, Mode=TwoWay}"></TextBox>
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.Description, Mode=TwoWay}"></TextBox>
 
-                        <TextBlock Grid.Column="0"
+                            <TextBlock Grid.Column="0"
                                Grid.Row="4">Autor</TextBlock>
-                        <TextBlock Grid.Column="1"
+                            <TextBlock Grid.Column="1"
                                Grid.Row="4"
-                               Text="{x:Bind ProjectPageViewModel.ProjectOverview.AuthorFullName, Mode=OneWay}"></TextBlock>
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.AuthorFullName, Mode=OneWay}"></TextBlock>
 
-                        <TextBlock Grid.Column="0"
+                            <TextBlock Grid.Column="0"
                                Grid.Row="5">Naučna oblast</TextBlock>
-                        <!-- zasad string i kucanje -->
-                        <TextBox Grid.Column="1"
+
+                            <TextBox Grid.Column="1"
                                Grid.Row="5"                       
-                               Text="{x:Bind ProjectPageViewModel.ProjectOverview.StudyField.Name, Mode=TwoWay}"></TextBox>
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.StudyField.Name, Mode=TwoWay}"></TextBox>
 
-                        <TextBlock Grid.Column="0"
+                            <TextBlock Grid.Column="0"
                                Grid.Row="6">Početak</TextBlock>
-                        <TextBox Grid.Column="1"
+                            <TextBox Grid.Column="1"
                                Grid.Row="6"
-                               Text="{x:Bind ProjectPageViewModel.ProjectOverview.StartDate, Mode=TwoWay}"></TextBox>
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.StartDate, Mode=TwoWay}"></TextBox>
 
-                        <TextBlock Grid.Column="0"
+                            <TextBlock Grid.Column="0"
                                Grid.Row="7">Kraj</TextBlock>
-                        <TextBox Grid.Column="1"
+                            <TextBox Grid.Column="1"
                                Grid.Row="7"
-                               Text="{x:Bind ProjectPageViewModel.ProjectOverview.EndDate, Mode=TwoWay}"></TextBox>
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.EndDate, Mode=TwoWay}"></TextBox>
 
-                        <TextBlock Grid.Column="0"
-                               Grid.Row="9">Profili studenata</TextBlock>
-                        <ListView Grid.Column="1"
+                            <TextBlock Grid.Column="0"
+                               Grid.Row="9">Saradnici na projektu</TextBlock>
+                            <ListView Grid.Column="1"
                               Grid.Row="9"
-                              ItemsSource="{x:Bind ProjectPageViewModel.ProjectOverview.StudentProfileDisplayModels, Mode=OneWay}"
-                              SelectionChanged="{x:Bind ProjectPageViewModel.StudentProfileSelected}"
-                              SelectedIndex="{x:Bind ProjectPageViewModel.SelectedStudentProfileIndex, Mode=TwoWay}"
-                              SelectedItem="{x:Bind ProjectPageViewModel.SelectedProfile, Mode=TwoWay}">
-                            <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="c:StudentProfileOverview">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{x:Bind FacultyName}"></TextBlock>
-                                        <TextBlock Text="{x:Bind StudyProgramName}"></TextBlock>
-                                        <TextBlock Text="{x:Bind StudyProgramSpecializationName}"></TextBlock>
-                                        <TextBlock Text="{x:Bind StudyCycle}"></TextBlock>
-                                        <TextBlock Text="{x:Bind StudyYear}"></TextBlock>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
+                              ItemsSource="{x:Bind ProjectPageViewModel.ClosedProjectOverview.CollaboratorOverviews, Mode=OneWay}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="c:CollaboratorOverview">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{x:Bind UserId}"></TextBlock>
+                                            <TextBlock Text="{x:Bind FirstName}"></TextBlock>
+                                            <TextBlock Text="{x:Bind LastName}"></TextBlock>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
 
-                        <TextBlock Grid.Column="0"
-                               Grid.Row="10">Profili nastavnog osoblja</TextBlock>
-                        <ListView Grid.Column="1"
-                              Grid.Row="10"
-                              ItemsSource="{x:Bind ProjectPageViewModel.ProjectOverview.FacultyMemberProfileDisplayModels, Mode=OneWay}"
-                              SelectionChanged="{x:Bind ProjectPageViewModel.FacultyMemberProfileSelected}"
-                              SelectedIndex="{x:Bind ProjectPageViewModel.SelectedFacultyMemberProfileIndex, Mode=TwoWay}"
-                              SelectedItem="{x:Bind ProjectPageViewModel.SelectedProfile, Mode=TwoWay}">
 
-                            <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="c:FacultyMemberProfileOverview">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{x:Bind FacultyName}"></TextBlock>
-                                        <TextBlock Text="{x:Bind StudyFieldName}"></TextBlock>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-
-                        </ListView>
-                        <TextBlock Grid.Column="0"
+                            <TextBlock Grid.Column="0"
                                Grid.Row="11">Tagovi</TextBlock>
-                        <GridView  Grid.Column="1"
+                            <GridView  Grid.Column="1"
                               Grid.Row="11"
-                               ItemsSource="{x:Bind ProjectPageViewModel.ProjectOverview.Tags, Mode=OneWay}">
-                            <GridView.ItemTemplate>
-                                <DataTemplate x:DataType="c1:Tag">
-                                    <TextBlock Text="{x:Bind Name}"></TextBlock>
-                                </DataTemplate>
-                            </GridView.ItemTemplate>
+                               ItemsSource="{x:Bind ProjectPageViewModel.ClosedProjectOverview.Tags, Mode=OneWay}">
+                                <GridView.ItemTemplate>
+                                    <DataTemplate x:DataType="c1:Tag">
+                                        <TextBlock Text="{x:Bind Name}"></TextBlock>
+                                    </DataTemplate>
+                                </GridView.ItemTemplate>
 
 
-                        </GridView>
+                            </GridView>
+                        </Grid>
+
+                        <!-- Closed project page controls -->
+                        <StackPanel Orientation="Horizontal"                                 
+                                    Grid.Row="2"
+                                    Grid.Column="0">
+                            <Button Margin="5"
+                                    Visibility="{x:Bind ProjectPageViewModel.DeleteButtonVisibility, Mode=TwoWay}">Obriši projekat</Button>
+                        </StackPanel>
+
                     </Grid>
-                    <Button Grid.Row="0"
-                            Grid.Column="1">EDIT</Button>
-                    <StackPanel Orientation="Horizontal"                                 
-                                Grid.Row="2"
-                            Grid.Column="0">
-                        <Button Margin="5"
-                                Click="{x:Bind ProjectPageViewModel.ApplyForPosition}">Prijavi se</Button>
-                        <!-- i odustani na istom dugmetu -->
-                        <Button Margin="5">Obriši</Button>
-                        <Button Margin="5">Odustani</Button>
-                    </StackPanel>
-
-                </Grid>
+                </StackPanel>
 
                 <!-- Sent applications -->
                 <controls:DataGrid 
                     Visibility="{x:Bind HomepageViewModel.Visibility.SentApplicationsVisibility, Mode=TwoWay}"
                     AutoGenerateColumns="True"
-                    ItemsSource="{x:Bind MyApplicationsViewModel.SentApplications, Mode=TwoWay}">
+                    ItemsSource="{x:Bind SentApplicationsViewModel.SentApplications, Mode=TwoWay}">
                 </controls:DataGrid>
 
                 <!-- Received applications -->
                 <controls:DataGrid 
-                    Visibility="{x:Bind HomepageViewModel.Visibility.ReceivedApplicationVisibility, Mode=TwoWay}"
+                    Visibility="{x:Bind HomepageViewModel.Visibility.ReceivedApplicationsVisibility, Mode=TwoWay}"
                     AutoGenerateColumns="True"
                     ItemsSource="{x:Bind ReceivedApplicationsViewModel.ReceivedApplications, Mode=TwoWay}">
                 </controls:DataGrid>

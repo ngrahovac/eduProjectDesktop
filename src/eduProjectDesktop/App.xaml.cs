@@ -23,7 +23,7 @@ namespace eduProjectDesktop
         public App()
         {
             // Zoran
-            User.CurrentUserId = 10; // TODO: implement logging
+            User.CurrentUserId = 9; // TODO: implement logging
 
             InitializeComponent();
             Suspending += OnSuspending;

@@ -2,18 +2,7 @@
 {
     public class CollaboratorProfile : IEntity
     {
-        public int CollaboratorProfileId { get; set; }
+        public int CollaboratorProfileId { get; set; } // TODO: make readonly
         public string Description { get; set; }
-
-        public CollaboratorProfile()
-        {
-
-        }
-
-        public CollaboratorProfile(string description)
-        {
-            Description = description;
-
-        }
     }
 }

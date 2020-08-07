@@ -20,8 +20,10 @@ namespace eduProjectDesktop.ViewModel
 {
     public class HomepageViewModel : INotifyPropertyChanged
     {
+        // section visibility
         public VisibilityToggle Visibility { get; set; } = new VisibilityToggle();
 
+        // referenced view models for passing data
         public ProjectPageViewModel ProjectPageViewModel { get; set; }
 
         public SentApplicationsViewModel SentApplicationsViewModel { get; set; }
@@ -32,6 +34,7 @@ namespace eduProjectDesktop.ViewModel
 
         public string SectionName { get; set; } = "Sekcija";
 
+        // project snippets and selected snippet
         public ObservableCollection<ProjectSnippet> ProjectSnippets { get; set; } = new ObservableCollection<ProjectSnippet>();
 
         private int selectedSnippetIndex = -1;
@@ -40,71 +43,16 @@ namespace eduProjectDesktop.ViewModel
 
         public ProjectSnippet SelectedSnippet { get; set; }
 
+        // menu item selection
+
         private object selectedMenuItem;
 
+        // TODO: trebamo li ovdje zvati event? selekcija se ne mijenja sa user strane.
         public object SelectedMenuItem { get { return selectedMenuItem; } set { selectedMenuItem = value; OnPropertyChanged(); } }
 
         public HomepageViewModel()
         {
 
-        }
-
-        public async Task LoadProjects()
-        {
-            Project project = await ((App)App.Current).projects.GetAsync(1); // zasad samo jedan
-            User author = await ((App)App.Current).users.GetAsync(project.AuthorId);
-
-            ProjectSnippet snippet = ProjectSnippet.FromProject(project, author);
-
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-            () =>
-            {
-                Visibility.ChangeVisibility(true, "Homepage");
-
-                ProjectSnippets.Clear();
-                ProjectSnippets.Add(snippet);
-            });
-        }
-
-        public async void ShowProjectPage()
-        {
-            // kad treba prikazati project page, u ovom view modelu se obradjuje event na nacin da se sakriju potrebna polja
-            // i posalje view modelu sta treba
-
-            if (SelectedSnippet != null)
-            {
-
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                () =>
-                {
-                    Visibility.ChangeVisibility(true, "ProjectPage");
-                });
-
-                Project project = await ((App)App.Current).projects.GetAsync(SelectedSnippet.ProjectId);
-                ProjectPageViewModel.SelectedProject = project; // SETUJEMO REF NA PROJEKAT DA VIEWMODEL MOZE REGISTROVATI
-                User author = await ((App)App.Current).users.GetAsync(project.AuthorId);
-                bool isAuthor = project.AuthorId == User.CurrentUserId;
-                ProjectStatus status = project.ProjectStatus;
-
-                // ako je aktivan, trebamo dohvatiti sve usere saradnike i sve to poslati na mapiranje view modelu
-                // zasad samo radimo sa aktivnim projektima; display model isti, forme se razlikuju u kontrolama
-
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-                () =>
-                {
-                    ProjectPageViewModel.ProjectOverview = ProjectOverview.FromProject(project, author, isAuthor);
-                });
-            }
-        }
-
-        public async void CloseProjectPage()
-        {
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-            () =>
-            {
-                Visibility.ChangeVisibility(true, "Homepage");
-                SelectedSnippetIndex = -1;  // TwoWay bound, so this will clear list item selection
-            });
         }
 
         public async void MenuItemSelectionChanged()
@@ -141,7 +89,58 @@ namespace eduProjectDesktop.ViewModel
             }
         }
 
-        private async Task DisplaySentApplicationsAsync()
+        public async Task LoadProjects()
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                ProjectSnippets.Clear();
+                Visibility.ChangeVisibility(true, "Homepage");
+            });
+
+            IEnumerable<Project> projects = await ((App)App.Current).projects.GetAllAsync();
+
+            foreach (var project in projects)
+            {
+                User author = await ((App)App.Current).users.GetAsync(project.AuthorId);
+                ProjectSnippet snippet = ProjectSnippet.FromProject(project, author);
+
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                () =>
+                {
+                    ProjectSnippets.Add(snippet);
+                });
+            }
+
+        }
+
+        public async void ShowProjectPage()
+        {
+            if (SelectedSnippet != null)
+            {
+
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                () =>
+                {
+                    Visibility.ChangeVisibility(true, "ProjectPage");
+                });
+
+                await ProjectPageViewModel.SetSelectedProject(SelectedSnippet.ProjectId);
+            }
+        }
+
+        // TODO: zasad je samo kad posjetimo project page, pa da se vratimo na homepage
+        public async void CloseProjectPage()
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                Visibility.ChangeVisibility(true, "Homepage");
+                SelectedSnippetIndex = -1;  // selected index is twoway bound; this deselects list items
+            });
+        }
+
+        public async Task DisplaySentApplicationsAsync()
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             async () =>
@@ -151,7 +150,7 @@ namespace eduProjectDesktop.ViewModel
             });
         }
 
-        private async Task DisplayReceivedApplicationsAsync()
+        public async Task DisplayReceivedApplicationsAsync()
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             async () =>
@@ -160,7 +159,6 @@ namespace eduProjectDesktop.ViewModel
                 await ReceivedApplicationsViewModel.LoadReceivedApplicationsAsync();
             });
         }
-
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

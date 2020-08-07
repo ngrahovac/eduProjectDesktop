@@ -24,7 +24,7 @@ namespace eduProjectDesktop.ViewModel
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             async () =>
             {
-                ReceivedApplications = new ObservableCollection<ProjectApplication>(await ((App)App.Current).applications.GetByAuthorAsync(9));
+                ReceivedApplications = new ObservableCollection<ProjectApplication>(await ((App)App.Current).applications.GetAllByAuthorAsync(9));
             });
         }
 
