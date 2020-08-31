@@ -175,7 +175,7 @@ namespace eduProjectDesktop.Data
                         project.Title = reader.GetString(1);
 
                         project.StartDate = !reader.IsDBNull(2) ? (DateTime?)reader.GetDateTime(2) : null;
-                        project.StartDate = !reader.IsDBNull(2) ? (DateTime?)reader.GetDateTime(3) : null;
+                        project.EndDate = !reader.IsDBNull(3) ? (DateTime?)reader.GetDateTime(3) : null;
 
                         project.Description = reader.GetString(4);
                         project.ProjectStatus = (ProjectStatus)Enum.ToObject(typeof(ProjectStatus), reader.GetInt32(6));
@@ -274,7 +274,7 @@ namespace eduProjectDesktop.Data
                 {
                     while (await reader.ReadAsync())
                     {
-                        project.Tags.Add(new Tag(reader.GetString(0), ""));
+                        project.Tags.Add(new Tag() { Name = reader.GetString(0), Description = "" });
                     }
                 }
             }
@@ -682,7 +682,8 @@ namespace eduProjectDesktop.Data
             string commandText = @"INSERT INTO project_collaborator
                                    (project_id, user_id)
                                    VALUES
-                                   (@projectId, @userId)";
+                                   (@projectId, @userId)
+                                   ON DUPLICATE KEY UPDATE project_id = @projectId";
 
             command.CommandText = commandText;
 

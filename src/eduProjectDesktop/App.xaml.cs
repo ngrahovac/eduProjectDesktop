@@ -19,11 +19,12 @@ namespace eduProjectDesktop
         public readonly ProjectsRepository projects;
         public readonly UsersRepository users;
         public readonly ProjectApplicationsRepository applications;
+        public readonly TagsRepository tags;
 
         public App()
         {
-            // Zoran
-            User.CurrentUserId = 9; // TODO: implement logging
+            // Bane
+            User.CurrentUserId = 12; // TODO: implement logging
 
             InitializeComponent();
             Suspending += OnSuspending;
@@ -32,6 +33,7 @@ namespace eduProjectDesktop
             projects = new ProjectsRepository();
             users = new UsersRepository();
             applications = new ProjectApplicationsRepository();
+            tags = new TagsRepository();
         }
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)

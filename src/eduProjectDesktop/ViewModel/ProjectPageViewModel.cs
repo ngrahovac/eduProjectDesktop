@@ -2,6 +2,7 @@
 using eduProjectDesktop.Model.Domain;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -111,7 +112,12 @@ namespace eduProjectDesktop.ViewModel
             }
         }
 
-        // controlling selected project
+        public ObservableCollection<string> SuggestedTags { get; set; } = new ObservableCollection<string>();
+
+        public void TagChosen()
+        {
+            ActiveProjectOverview.Tags.Add(new Tag() { Name = "test tag" });
+        }
 
         public Project SelectedProject { get; set; }
 
@@ -170,8 +176,24 @@ namespace eduProjectDesktop.ViewModel
             }
         }
 
+        private bool isEditDisabled = true;
+        public bool IsEditDisabled { get { return isEditDisabled; } set { isEditDisabled = value; OnPropertyChanged(); } }
+
+        public bool isTagSearchEnabled = false;
+        public bool IsTagSearchEnabled { get { return isTagSearchEnabled; } set { isTagSearchEnabled = value; OnPropertyChanged(); } }
+
         public async Task SetSelectedProject(int id)
         {
+            // setting initial tags
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                IEnumerable<Tag> tags = ((App)App.Current).tags.GetAll();
+                foreach (var tag in tags)
+                    SuggestedTags.Add(tag.Name);
+            });
+
+
             SelectedProject = await ((App)App.Current).projects.GetAsync(id);
             SetControlsVisibilityAsync();
 
@@ -180,22 +202,22 @@ namespace eduProjectDesktop.ViewModel
 
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             async () =>
-            {
-                if (SelectedProject.ProjectStatus == ProjectStatus.Active)
                 {
-                    ActiveProjectOverview = ActiveProjectOverview.FromProject(SelectedProject, user);
-                    ActiveProjectVisibility = Visibility.Visible;
-                }
-                else if (SelectedProject.ProjectStatus == ProjectStatus.Closed)
-                {
-                    List<User> collaborators = new List<User>();
-                    foreach (int profileId in SelectedProject.CollaboratorIds)
-                        collaborators.Add(await ((App)App.Current).users.GetAsync(profileId));
+                    if (SelectedProject.ProjectStatus == ProjectStatus.Active)
+                    {
+                        ActiveProjectOverview = ActiveProjectOverview.FromProject(SelectedProject, user);
+                        ActiveProjectVisibility = Visibility.Visible;
+                    }
+                    else if (SelectedProject.ProjectStatus == ProjectStatus.Closed)
+                    {
+                        List<User> collaborators = new List<User>();
+                        foreach (int profileId in SelectedProject.CollaboratorIds)
+                            collaborators.Add(await ((App)App.Current).users.GetAsync(profileId));
 
-                    ClosedProjectOverview = ClosedProjectOverview.FromProject(SelectedProject, user, collaborators);
-                    ClosedProjectVisibility = Visibility.Visible;
-                }
-            });
+                        ClosedProjectOverview = ClosedProjectOverview.FromProject(SelectedProject, user, collaborators);
+                        ClosedProjectVisibility = Visibility.Visible;
+                    }
+                });
         }
 
         // sets initial button visibility
@@ -362,12 +384,14 @@ namespace eduProjectDesktop.ViewModel
 
         }
 
-        public void EditProjectAsync()
+        public async Task EditProjectAsync()
         {
-            // enable edit controls 
-            Debug.WriteLine("enable fields for edit");
-
-            // throw new NotImplementedException();
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                IsEditDisabled = false;
+                IsTagSearchEnabled = true;
+            });
         }
 
         public void DeleteProject()
@@ -383,14 +407,9 @@ namespace eduProjectDesktop.ViewModel
 
         public async void SaveChangesAsync()
         {
-            // edit enablovao kontrole, user izmijenio polja
-            // save button updateuje projekat
-
             SelectedProject.Title = ActiveProjectOverview.Title;
             SelectedProject.Description = ActiveProjectOverview.Description;
-            // start date, end date, study field
-            // tags
-            // status u drugoj fji
+            // TODO: other fields
 
             await ((App)App.Current).projects.UpdateAsync(SelectedProject);
         }

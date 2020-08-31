@@ -82,9 +82,6 @@ namespace eduProjectDesktop.ViewModel
 
                 await ((App)App.Current).projects.UpdateAsync(project);
             }
-
-
-
         }
 
         public async Task RejectApplicationAsync()

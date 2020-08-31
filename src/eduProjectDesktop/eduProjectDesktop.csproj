@@ -124,7 +124,9 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Config.cs" />
+    <Compile Include="Data\FacultiesRepository.cs" />
     <Compile Include="Data\ProjectApplicationsRepository.cs" />
+    <Compile Include="Data\TagsRepository.cs" />
     <Compile Include="Data\UsersRepository.cs" />
     <Compile Include="Data\ProjectsRepository.cs" />
     <Compile Include="MainPage.xaml.cs">
