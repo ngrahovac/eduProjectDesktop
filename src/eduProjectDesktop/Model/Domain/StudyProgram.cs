@@ -7,25 +7,11 @@ namespace eduProjectDesktop.Model.Domain
         public string Name { get; set; }
         public byte Cycle { get; set; }
         public byte DurationYears { get; set; }
-        public ICollection<StudyProgramSpecialization> StudyProgramSpecializations { get; set; }
+        public Dictionary<int, StudyProgramSpecialization> StudyProgramSpecializations { get; set; } = new Dictionary<int, StudyProgramSpecialization>();
 
-        public StudyProgram(string name, byte cycle, byte durationYears)
+        public void AddStudyProgramSpecialization(int id, StudyProgramSpecialization specialization)
         {
-            Name = name;
-            Cycle = cycle;
-            DurationYears = durationYears;
-            StudyProgramSpecializations = new HashSet<StudyProgramSpecialization>();
+            StudyProgramSpecializations.Add(id, specialization);
         }
-
-        public StudyProgram()
-        {
-            StudyProgramSpecializations = new HashSet<StudyProgramSpecialization>();
-        }
-
-        public void AddProgramSpecialization(StudyProgramSpecialization specialization)
-        {
-            StudyProgramSpecializations.Add(specialization);
-        }
-        // ograniciti smjerove?
     }
 }

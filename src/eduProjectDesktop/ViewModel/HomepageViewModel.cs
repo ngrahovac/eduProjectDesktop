@@ -32,6 +32,8 @@ namespace eduProjectDesktop.ViewModel
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public CreateProjectViewModel CreateProjectViewModel { get; set; }
+
         public string SectionName { get; set; } = "Sekcija";
 
         // project snippets and selected snippet
@@ -83,6 +85,11 @@ namespace eduProjectDesktop.ViewModel
                     case "Pristigle prijave":
                         {
                             await DisplayReceivedApplicationsAsync();
+                            break;
+                        }
+                    case "Novi projekat":
+                        {
+                            await DisplayCreateProjectPageAsync();
                             break;
                         }
                 }
@@ -161,6 +168,16 @@ namespace eduProjectDesktop.ViewModel
             });
         }
 
+        public async Task DisplayCreateProjectPageAsync()
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            async () =>
+            {
+                Visibility.ChangeVisibility(true, "CreateProject");
+                await CreateProjectViewModel.PopulateFieldData();
+
+            });
+        }
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

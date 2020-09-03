@@ -163,7 +163,12 @@
     <Compile Include="Model\Domain\User.cs" />
     <Compile Include="Model\Domain\UserAccountType.cs" />
     <Compile Include="Model\Domain\UserSettings.cs" />
+    <Compile Include="Model\Input\CollaboratorProfileInputModel.cs" />
+    <Compile Include="Model\Input\FacultyMemberProfileInputModel.cs" />
+    <Compile Include="Model\Input\ProjectInputModel.cs" />
+    <Compile Include="Model\Input\StudentProfileInputModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModel\CreateProjectViewModel.cs" />
     <Compile Include="ViewModel\HomepageViewModel.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
     <Compile Include="ViewModel\SentApplicationsViewModel.cs" />

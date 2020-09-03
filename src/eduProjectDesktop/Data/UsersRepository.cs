@@ -11,11 +11,12 @@ namespace eduProjectDesktop.Data
         public async Task<User> GetAsync(int id)
         {
             string commandText = @"SELECT user_id, user_account_type_id, first_name, last_name, phone_number, phone_format,
-	                                            student.study_year,
-	                                            faculty.name, faculty.address, study_program.name, study_program.cycle, study_program.duration_years,
-	                                            study_program_specialization.name,
-                                                academic_rank.name,
-                                                study_field.name
+	                                            student.study_year,	                                            
+                                                study_program.faculty_id,
+                                                student.study_program_id, student.study_program_specialization_id,
+                                                faculty_member.faculty_id,
+                                                academic_rank_id,
+                                                study_field_id
        
                                       FROM user
                                       INNER JOIN account using(user_id)
@@ -71,36 +72,40 @@ namespace eduProjectDesktop.Data
 
             if (accountType is UserAccountType.Student)
             {
-                Student student = new Student();
-                student.StudyYear = reader.GetInt32(6);
-
-                student.StudyProgram = new StudyProgram
+                Student student = new Student
                 {
-                    Name = reader.GetString(9),
-                    Cycle = reader.GetByte(10),
-                    DurationYears = reader.GetByte(11)
+                    StudyYear = reader.GetInt32(6)
                 };
 
-                student.StudyProgramSpecialization = new StudyProgramSpecialization
+                int? facultyId = !reader.IsDBNull(7) ? (int?)reader.GetInt32(7) : null;
+                int? programId = !reader.IsDBNull(8) ? (int?)reader.GetInt32(8) : null;
+                int? specializationId = !reader.IsDBNull(9) ? (int?)reader.GetInt32(9) : null;
+
+                if (facultyId != null)
                 {
-                    Name = reader.GetString(12)
-                };
+                    Faculty faculty = ((App)App.Current).faculties.GetFacultyById((int)facultyId);
+
+                    if (programId != null)
+                    {
+                        StudyProgram program = faculty.StudyPrograms[(int)programId];
+                        student.StudyProgram = program;
+
+                        if (specializationId != null)
+                        {
+                            StudyProgramSpecialization specialization = program.StudyProgramSpecializations[(int)specializationId];
+                            student.StudyProgramSpecialization = specialization;
+                        }
+                    }
+                }
 
                 user = student;
             }
             else if (accountType is UserAccountType.FacultyMember)
             {
                 FacultyMember facultyMember = new FacultyMember();
-                facultyMember.Faculty = new Faculty
-                {
-                    Name = reader.GetString(7),
-                    Address = reader.GetString(8)
-                };
-                facultyMember.AcademicRank = (AcademicRank)Enum.ToObject(typeof(AcademicRank), reader.GetInt32(13));
-                facultyMember.StudyField = new StudyField
-                {
-                    Name = reader.GetString(14)
-                };
+                facultyMember.Faculty = ((App)App.Current).faculties.GetFacultyById(reader.GetInt32(10));
+                facultyMember.AcademicRank = (AcademicRank)Enum.ToObject(typeof(AcademicRank), reader.GetInt32(11));
+                facultyMember.StudyField = ((App)App.Current).faculties.GetStudyFieldById(reader.GetInt32(12));
 
                 user = facultyMember;
             }

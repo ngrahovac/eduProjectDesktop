@@ -18,10 +18,11 @@ namespace eduProjectDesktop.Model.Display
         }
         public static FacultyMemberProfileOverview FromFacultyMemberProfile(FacultyMemberProfile profile)
         {
-            FacultyMemberProfileOverview model = new FacultyMemberProfileOverview();
-
-            model.FacultyName = profile.Faculty.Name;
-            model.StudyFieldName = profile.StudyField.Name;
+            FacultyMemberProfileOverview model = new FacultyMemberProfileOverview
+            {
+                FacultyName = profile.Faculty.Name,
+                StudyFieldName = profile.StudyField != null ? profile.StudyField.Name : null
+            };
 
             return model;
         }

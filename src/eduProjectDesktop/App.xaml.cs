@@ -1,6 +1,8 @@
 ﻿using eduProjectDesktop.Data;
 using eduProjectDesktop.Model.Domain;
 using eduProjectDesktop.View;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -20,20 +22,26 @@ namespace eduProjectDesktop
         public readonly UsersRepository users;
         public readonly ProjectApplicationsRepository applications;
         public readonly TagsRepository tags;
+        public readonly FacultiesRepository faculties;
 
         public App()
         {
-            // Bane
-            User.CurrentUserId = 12; // TODO: implement logging
+            // Nina
+            User.CurrentUserId = 9; // TODO: implement logging
 
             InitializeComponent();
             Suspending += OnSuspending;
 
-            // repositories jer nemam DI u UWP
             projects = new ProjectsRepository();
             users = new UsersRepository();
             applications = new ProjectApplicationsRepository();
-            tags = new TagsRepository();
+
+            // FIX
+            Task.Run(() => TagsRepository.CreateAsync()).Wait();
+            tags = TagsRepository.instance;
+
+            Task.Run(() => FacultiesRepository.CreateAsync()).Wait();
+            faculties = FacultiesRepository.instance;
         }
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)

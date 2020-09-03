@@ -26,11 +26,6 @@ namespace eduProjectDesktop.Model.Domain
             CollaboratorIds.Add(id);
         }
 
-        public void AddTag(Tag tag)
-        {
-            Tags.Add(tag);
-        }
-
 
     }
 }

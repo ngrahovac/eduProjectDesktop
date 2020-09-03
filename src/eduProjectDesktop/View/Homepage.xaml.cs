@@ -25,6 +25,9 @@ namespace eduProjectDesktop.View
         public SentApplicationsViewModel SentApplicationsViewModel { get; set; }
 
         public ReceivedApplicationsViewModel ReceivedApplicationsViewModel { get; set; }
+
+        public CreateProjectViewModel CreateProjectViewModel { get; set; }
+
         public Homepage()
         {
             this.InitializeComponent();
@@ -38,6 +41,10 @@ namespace eduProjectDesktop.View
 
             ReceivedApplicationsViewModel = new ReceivedApplicationsViewModel();
             HomepageViewModel.ReceivedApplicationsViewModel = ReceivedApplicationsViewModel;
+
+            CreateProjectViewModel = new CreateProjectViewModel();
+            HomepageViewModel.CreateProjectViewModel = CreateProjectViewModel;
         }
+
     }
 }

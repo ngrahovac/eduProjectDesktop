@@ -6,16 +6,13 @@ namespace eduProjectDesktop.Model.Domain
     {
         public string Name { get; set; }
         public string Address { get; set; }
-        public ICollection<StudyProgram> StudyPrograms { get; set; }
+        public Dictionary<int, StudyProgram> StudyPrograms { get; set; } = new Dictionary<int, StudyProgram>();
 
-        public Faculty()
+        public void AddStudyProgram(int id, StudyProgram program)
         {
-            StudyPrograms = new HashSet<StudyProgram>();
+            StudyPrograms.Add(id, program);
         }
-        public void AddStudyProgram(StudyProgram program)
-        {
-            StudyPrograms.Add(program);
-        }
-        // ograniciti programe na 5 ?
+
+
     }
 }

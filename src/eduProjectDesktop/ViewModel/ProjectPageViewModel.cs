@@ -250,7 +250,7 @@ namespace eduProjectDesktop.ViewModel
                     }
                     else
                     {
-
+                        DeleteButtonVisibility = Visibility.Collapsed;
                     }
                 }
             });
@@ -384,16 +384,6 @@ namespace eduProjectDesktop.ViewModel
 
         }
 
-        public async Task EditProjectAsync()
-        {
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-            () =>
-            {
-                IsEditDisabled = false;
-                IsTagSearchEnabled = true;
-            });
-        }
-
         public void DeleteProject()
         {
             throw new NotImplementedException();
@@ -405,13 +395,19 @@ namespace eduProjectDesktop.ViewModel
             await ((App)App.Current).projects.UpdateAsync(SelectedProject);
         }
 
+        public async Task EditProjectAsync()
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                IsEditDisabled = false;
+                IsTagSearchEnabled = true;
+            });
+        }
+
         public async void SaveChangesAsync()
         {
-            SelectedProject.Title = ActiveProjectOverview.Title;
-            SelectedProject.Description = ActiveProjectOverview.Description;
-            // TODO: other fields
-
-            await ((App)App.Current).projects.UpdateAsync(SelectedProject);
+            throw new NotImplementedException();
         }
 
         public void CancelChangesAsync()
