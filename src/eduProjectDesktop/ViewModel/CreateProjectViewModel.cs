@@ -25,7 +25,7 @@ namespace eduProjectDesktop.ViewModel
 
         public ObservableCollection<string> TagNames = new ObservableCollection<string>();
 
-        public ObservableCollection<string> SelectedTags = new ObservableCollection<string>();
+        public ObservableCollection<string> AddedTags = new ObservableCollection<string>();
 
         public ObservableCollection<string> CollaboratorProfileTypes = new ObservableCollection<string>(new List<string> { "Student", "Nastavno osoblje" });
 
@@ -113,13 +113,17 @@ namespace eduProjectDesktop.ViewModel
             });
         }
 
-        public void TagChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        public async void TagChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
             string tagName = (string)args.SelectedItem;
             if (!ProjectInputModel.TagNames.Contains(tagName))
             {
-                ProjectInputModel.TagNames.Add((string)args.SelectedItem);
-                SelectedTags.Add(tagName);
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                () =>
+                {
+                    ProjectInputModel.TagNames.Add((string)args.SelectedItem);
+                    AddedTags.Add(tagName);
+                });
             }
         }
 
@@ -131,9 +135,15 @@ namespace eduProjectDesktop.ViewModel
             }
         }
 
-        public void TagRemoved(object sender, SelectionChangedEventArgs e)
+        public async void TagRemoved(object sender, ItemClickEventArgs e)
         {
-            throw new NotImplementedException();
+            string tagName = (string)e.ClickedItem;
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                ProjectInputModel.TagNames.Remove(tagName);
+                AddedTags.Remove(tagName);
+            });
         }
 
         // profili saradnika
@@ -256,26 +266,38 @@ namespace eduProjectDesktop.ViewModel
             });
         }
 
-        public void ResetProfile()
-        {
-            StudentProfileInputModel = new StudentProfileInputModel();
-            FacultyMemberProfileInputModel = new FacultyMemberProfileInputModel();
-        }
-
         public async void SaveProject()
         {
-            Project project = ProjectInputModel.ToProject(ProjectInputModel);
-            await ((App)App.Current).projects.CreateAsync(project);
-
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-            async () =>
+            if (RequiredProjectFieldsFilled())
             {
-                SelectedTags.Clear();
-            });
+                Project project = ProjectInputModel.ToProject(ProjectInputModel);
+                await ((App)App.Current).projects.CreateAsync(project);
 
-            ProjectInputModel = new ProjectInputModel();
-            StudentProfileInputModel = new StudentProfileInputModel();
-            FacultyMemberProfileInputModel = new FacultyMemberProfileInputModel();
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                () =>
+                {
+                    AddedTags.Clear();
+                });
+
+                ProjectInputModel = new ProjectInputModel();
+                StudentProfileInputModel = new StudentProfileInputModel();
+                FacultyMemberProfileInputModel = new FacultyMemberProfileInputModel();
+            }
+        }
+
+        private bool RequiredProjectFieldsFilled()
+        {
+            if (ProjectInputModel.Title != null && ProjectInputModel.Title.Trim() != ""
+                && ProjectInputModel.Description != null && ProjectInputModel.Description.Trim() != ""
+                && ProjectInputModel.StudyFieldName != null
+                && ProjectInputModel.CollaboratorProfileInputModels.Count() > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public void Cancel()

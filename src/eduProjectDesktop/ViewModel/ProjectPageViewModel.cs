@@ -463,6 +463,17 @@ namespace eduProjectDesktop.ViewModel
             });
         }
 
+        public async void TagRemoved(object sender, ItemClickEventArgs e)
+        {
+            string tagName = (string)e.ClickedItem;
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                ProjectInputModel.TagNames.Remove(tagName);
+                AddedTags.Remove(tagName);
+            });
+        }
+
         public async void StudyFieldSelected(object sender, SelectionChangedEventArgs e)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,

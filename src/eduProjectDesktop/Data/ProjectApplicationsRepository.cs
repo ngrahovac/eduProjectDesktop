@@ -30,9 +30,9 @@ namespace eduProjectDesktop.Data
                 Value = id
             });
 
-            List<ProjectApplication> applications = new List<ProjectApplication>();
+            ICollection<ProjectApplication> applications = new List<ProjectApplication>();
 
-            using (MySqlConnection connection = new MySqlConnection(Config.dbConnectionString))
+            using (var connection = new MySqlConnection(Config.dbConnectionString))
             {
                 await connection.OpenAsync();
                 command.Connection = connection;
@@ -74,9 +74,9 @@ namespace eduProjectDesktop.Data
                 Value = id
             });
 
-            List<ProjectApplication> applications = new List<ProjectApplication>();
+            ICollection<ProjectApplication> applications = new List<ProjectApplication>();
 
-            using (MySqlConnection connection = new MySqlConnection(Config.dbConnectionString))
+            using (var connection = new MySqlConnection(Config.dbConnectionString))
             {
                 await connection.OpenAsync();
                 command.Connection = connection;
@@ -124,7 +124,7 @@ namespace eduProjectDesktop.Data
                 Value = id
             });
 
-            List<ProjectApplication> applications = new List<ProjectApplication>();
+            ICollection<ProjectApplication> applications = new List<ProjectApplication>();
 
             using (var connection = new MySqlConnection(Config.dbConnectionString))
             {

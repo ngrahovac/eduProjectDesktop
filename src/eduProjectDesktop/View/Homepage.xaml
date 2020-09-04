@@ -173,7 +173,9 @@
 
                             <TextBlock>Tagovi</TextBlock>
                             <GridView
-                                ItemsSource="{x:Bind ProjectPageViewModel.AddedTags, Mode=OneWay}">
+                                ItemsSource="{x:Bind ProjectPageViewModel.AddedTags, Mode=OneWay}"
+                                IsItemClickEnabled="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
+                                ItemClick="{x:Bind ProjectPageViewModel.TagRemoved}">
                             </GridView>
                             <AutoSuggestBox
                                 IsEnabled="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
@@ -409,7 +411,9 @@
 
                         <TextBlock>Tagovi</TextBlock>
                         <GridView
-                                ItemsSource="{x:Bind CreateProjectViewModel.SelectedTags, Mode=OneWay}">
+                                ItemsSource="{x:Bind CreateProjectViewModel.AddedTags, Mode=OneWay}"
+                                IsItemClickEnabled="True"
+                                ItemClick="{x:Bind CreateProjectViewModel.TagRemoved}">
                         </GridView>
 
                         <AutoSuggestBox 
@@ -530,8 +534,6 @@
                             Grid.Column="1">
                         <Button
                                 Click="{x:Bind CreateProjectViewModel.AddProfile}">Dodaj profil</Button>
-                        <Button
-                                Click="{x:Bind CreateProjectViewModel.ResetProfile}">Odustani</Button>
                     </StackPanel>
 
                     <!-- Create project page controls -->

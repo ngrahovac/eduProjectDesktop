@@ -15,7 +15,7 @@ namespace eduProjectDesktop.Data
         {
             Project project = new Project();
 
-            using (MySqlConnection connection = new MySqlConnection(Config.dbConnectionString))
+            using (var connection = new MySqlConnection(Config.dbConnectionString))
             {
                 await connection.OpenAsync();
 
@@ -39,9 +39,10 @@ namespace eduProjectDesktop.Data
         {
             Project project = new Project();
 
-            using (MySqlConnection connection = new MySqlConnection(Config.dbConnectionString))
+            using (var connection = new MySqlConnection(Config.dbConnectionString))
             {
                 await connection.OpenAsync();
+
                 MySqlCommand command = new MySqlCommand
                 {
                     Connection = connection
@@ -94,7 +95,7 @@ namespace eduProjectDesktop.Data
             List<int> projectIds = new List<int>();
 
 
-            using (MySqlConnection connection = new MySqlConnection(Config.dbConnectionString))
+            using (var connection = new MySqlConnection(Config.dbConnectionString))
             {
                 await connection.OpenAsync();
 
@@ -104,8 +105,8 @@ namespace eduProjectDesktop.Data
                 {
                     Connection = connection
                 };
-                command.CommandText = @"SELECT project_id
-                                        FROM project";
+
+                command.CommandText = @"SELECT project_id FROM project";
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -122,9 +123,10 @@ namespace eduProjectDesktop.Data
             }
 
 
-            using (MySqlConnection connection = new MySqlConnection(Config.dbConnectionString))
+            using (var connection = new MySqlConnection(Config.dbConnectionString))
             {
                 await connection.OpenAsync();
+
                 MySqlCommand command = new MySqlCommand
                 {
                     Connection = connection
@@ -153,12 +155,14 @@ namespace eduProjectDesktop.Data
         private async Task ReadBasicProjectInfo(MySqlCommand command, int id, Project project)
         {
             string commandText = @"SELECT project_id, title,  start_date, end_date, project.description, project.study_field_id, project_status_id, user_id
-                                              FROM project
-                                              INNER JOIN study_field ON project.study_field_id = study_field.study_field_id
-                                              WHERE project.project_id = @id";
+                                   FROM project
+                                   INNER JOIN study_field ON project.study_field_id = study_field.study_field_id
+                                   WHERE project.project_id = @id";
 
             command.CommandText = commandText;
+
             command.Parameters.Clear();
+
             command.Parameters.Add(new MySqlParameter
             {
                 DbType = DbType.Int32,
@@ -190,17 +194,17 @@ namespace eduProjectDesktop.Data
         private async Task ReadCollaboratorProfilesInfo(MySqlCommand command, int id, Project project)
         {
             string commandText = @"SELECT collaborator_profile_id, collaborator_profile.description, user_account_type_id, 
-	                                                       student_profile.cycle, study_year,
-	                                                       faculty.faculty_id, study_program.study_program_id, study_program_specialization.study_program_specialization_id,       
-	                                                       study_field.study_field_id
-                                                           FROM collaborator_profile
-                                                           LEFT OUTER JOIN student_profile USING(collaborator_profile_id)
-                                                           LEFT OUTER JOIN faculty_member_profile USING(collaborator_profile_id)
-                                                           LEFT OUTER JOIN faculty ON student_profile.faculty_id = faculty.faculty_id OR faculty_member_profile.faculty_id = faculty.faculty_id
-                                                           LEFT OUTER JOIN study_program ON student_profile.study_program_id = study_program.study_program_id
-                                                           LEFT OUTER JOIN study_program_specialization ON student_profile.study_program_specialization_id = study_program_specialization.study_program_specialization_id
-                                                           LEFT OUTER JOIN study_field ON faculty_member_profile.study_field_id = study_field.study_field_id
-                                                           WHERE project_id = @id";
+	                               student_profile.cycle, study_year,
+	                               faculty.faculty_id, study_program.study_program_id, study_program_specialization.study_program_specialization_id,       
+	                               study_field.study_field_id
+                                   FROM collaborator_profile
+                                   LEFT OUTER JOIN student_profile USING(collaborator_profile_id)
+                                   LEFT OUTER JOIN faculty_member_profile USING(collaborator_profile_id)
+                                   LEFT OUTER JOIN faculty ON student_profile.faculty_id = faculty.faculty_id OR faculty_member_profile.faculty_id = faculty.faculty_id
+                                   LEFT OUTER JOIN study_program ON student_profile.study_program_id = study_program.study_program_id
+                                   LEFT OUTER JOIN study_program_specialization ON student_profile.study_program_specialization_id = study_program_specialization.study_program_specialization_id
+                                   LEFT OUTER JOIN study_field ON faculty_member_profile.study_field_id = study_field.study_field_id
+                                   WHERE project_id = @id";
 
             command.CommandText = commandText;
             command.Parameters.Clear();
@@ -358,10 +362,10 @@ namespace eduProjectDesktop.Data
         {
             string commandText = @"INSERT INTO project
                                    (user_id, title, project_status_id, description,
-                                    study_field_id, start_date, end_date)
+                                   study_field_id, start_date, end_date)
                                    VALUES
                                    (@userId, @title, @statusId, @description,
-                                    @studyFieldId, @startDate, @endDate)";
+                                   @studyFieldId, @startDate, @endDate)";
 
             command.CommandText = commandText;
 
@@ -466,10 +470,10 @@ namespace eduProjectDesktop.Data
                 {
                     commandText = @"INSERT INTO student_profile
                                     (collaborator_profile_id, cycle, study_year,
-                                     faculty_id, study_program_id, study_program_specialization_id)
+                                    faculty_id, study_program_id, study_program_specialization_id)
                                     VALUES
                                     (@collaboratorProfileId, @cycle, @studyYear,
-                                     @facultyId, @studyProgramId, @studyProgramSpecializationId)";
+                                    @facultyId, @studyProgramId, @studyProgramSpecializationId)";
 
                     command.CommandText = commandText;
 

@@ -11,24 +11,23 @@ namespace eduProjectDesktop.Data
         public async Task<User> GetAsync(int id)
         {
             string commandText = @"SELECT user_id, user_account_type_id, first_name, last_name, phone_number, phone_format,
-	                                            student.study_year,	                                            
-                                                study_program.faculty_id,
-                                                student.study_program_id, student.study_program_specialization_id,
-                                                faculty_member.faculty_id,
-                                                academic_rank_id,
-                                                study_field_id
+	                                      student.study_year,	                                            
+                                          study_program.faculty_id,
+                                          student.study_program_id, student.study_program_specialization_id,
+                                          faculty_member.faculty_id,
+                                          academic_rank_id,
+                                          study_field_id
        
-                                      FROM user
-                                      INNER JOIN account using(user_id)
-                                      LEFT OUTER JOIN student using(user_id)
-                                      LEFT OUTER JOIN faculty_member using (user_id)
-                                      LEFT OUTER JOIN study_program using(study_program_id)
-                                      LEFT OUTER JOIN study_program_specialization using(study_program_specialization_id)
-                                      LEFT OUTER JOIN faculty ON faculty_member.faculty_id = faculty.faculty_id  OR study_program.faculty_id = faculty.faculty_id 
-                                      LEFT OUTER JOIN academic_rank using(academic_rank_id)
-                                      LEFT OUTER JOIN study_field using(study_field_id)
+                                    FROM user
+                                    INNER JOIN account using(user_id)
+                                    LEFT OUTER JOIN student using(user_id)
+                                    LEFT OUTER JOIN faculty_member using (user_id)
+                                    LEFT OUTER JOIN study_program using(study_program_id)
+                                    LEFT OUTER JOIN study_program_specialization using(study_program_specialization_id)
+                                    LEFT OUTER JOIN academic_rank using(academic_rank_id)
+                                    LEFT OUTER JOIN study_field using(study_field_id)
 
-                                      WHERE user.user_id = @id;";
+                                    WHERE user.user_id = @id;";
 
             MySqlCommand command = new MySqlCommand
             {
@@ -44,7 +43,7 @@ namespace eduProjectDesktop.Data
 
             User user = null;
 
-            using (MySqlConnection connection = new MySqlConnection(Config.dbConnectionString))
+            using (var connection = new MySqlConnection(Config.dbConnectionString))
             {
                 await connection.OpenAsync();
                 command.Connection = connection;
@@ -102,10 +101,12 @@ namespace eduProjectDesktop.Data
             }
             else if (accountType is UserAccountType.FacultyMember)
             {
-                FacultyMember facultyMember = new FacultyMember();
-                facultyMember.Faculty = ((App)App.Current).faculties.GetFacultyById(reader.GetInt32(10));
-                facultyMember.AcademicRank = (AcademicRank)Enum.ToObject(typeof(AcademicRank), reader.GetInt32(11));
-                facultyMember.StudyField = ((App)App.Current).faculties.GetStudyFieldById(reader.GetInt32(12));
+                FacultyMember facultyMember = new FacultyMember
+                {
+                    Faculty = ((App)App.Current).faculties.GetFacultyById(reader.GetInt32(10)),
+                    AcademicRank = (AcademicRank)Enum.ToObject(typeof(AcademicRank), reader.GetInt32(11)),
+                    StudyField = ((App)App.Current).faculties.GetStudyFieldById(reader.GetInt32(12))
+                };
 
                 user = facultyMember;
             }
