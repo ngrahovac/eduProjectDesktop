@@ -244,7 +244,6 @@ namespace eduProjectDesktop.Data
                                     int? specializationId = !reader.IsDBNull(7) ? (int?)reader.GetInt32(7) : null;
                                     if (specializationId != null)
                                     {
-                                        var item = profile.StudyProgram;
                                         profile.StudyProgramSpecialization = profile.StudyProgram.StudyProgramSpecializations[(int)specializationId];
                                     }
                                 }
@@ -456,7 +455,7 @@ namespace eduProjectDesktop.Data
                 {
                     DbType = DbType.Int32,
                     ParameterName = "@accountTypeId",
-                    Value = (int)CollaboratorProfileType.Student
+                    Value = profile is StudentProfile ? 1 : 2
                 });
 
                 await command.ExecuteNonQueryAsync();
@@ -497,7 +496,7 @@ namespace eduProjectDesktop.Data
                         Value = sp.StudyYear
                     });
 
-                   command.Parameters.Add(new MySqlParameter
+                    command.Parameters.Add(new MySqlParameter
                     {
                         DbType = DbType.Int32,
                         ParameterName = "@facultyId",
@@ -588,23 +587,7 @@ namespace eduProjectDesktop.Data
 
             await command.ExecuteNonQueryAsync();
         }
-        /*
-        public async Task UpdateProjectStatusAsync(Project project)
-        {
-            using (var connection = new MySqlConnection(Config.dbConnectionString))
-            {
-                await connection.OpenAsync();
-                MySqlCommand command = new MySqlCommand
-                {
-                    Connection = connection
-                };
 
-                await UpdateBasicProjectInfo(command, project);
-
-                await connection.CloseAsync();
-            }
-        }
-        */
         public async Task UpdateAsync(Project project)
         {
             using (var connection = new MySqlConnection(Config.dbConnectionString))
@@ -616,7 +599,6 @@ namespace eduProjectDesktop.Data
                 };
 
                 await UpdateBasicProjectInfo(command, project);
-                await UpdateCollaboratorProfiles(command, project);
                 await UpdateProjectTags(command, project);
                 await UpdateCollaboratorIds(command, project);
 
@@ -672,14 +654,14 @@ namespace eduProjectDesktop.Data
             {
                 DbType = DbType.DateTime,
                 ParameterName = "@startDate",
-                Value = project.StartDate
+                Value = project.StartDate ?? null
             });
 
             command.Parameters.Add(new MySqlParameter
             {
                 DbType = DbType.DateTime,
                 ParameterName = "@endDate",
-                Value = project.EndDate
+                Value = project.EndDate ?? null
             });
 
             command.Parameters.Add(new MySqlParameter
@@ -690,149 +672,6 @@ namespace eduProjectDesktop.Data
             });
 
             await command.ExecuteNonQueryAsync();
-        }
-
-        private async Task UpdateCollaboratorProfiles(MySqlCommand command, Project project)
-        {
-            var studentProfiles = project.CollaboratorProfiles.Where(p => p is StudentProfile);
-            var facultyMemberProfiles = project.CollaboratorProfiles.Where(p => p is FacultyMemberProfile);
-
-            string commandText = @"INSERT INTO collaborator_profile
-                                   (description, project_id, user_account_type_id)
-                                   VALUES
-                                   (@description, @projectId, @accountTypeId)
-                                   ON DUPLICATE KEY UPDATE project_id = @projectId";
-
-            foreach (var profile in project.CollaboratorProfiles)
-            {
-                if (profile.Added)
-                {
-                    command.CommandText = commandText;
-
-                    command.Parameters.Clear();
-
-                    command.Parameters.Add(new MySqlParameter
-                    {
-                        DbType = DbType.String,
-                        ParameterName = "@description",
-                        Value = profile.Description
-                    });
-
-                    command.Parameters.Add(new MySqlParameter
-                    {
-                        DbType = DbType.Int32,
-                        ParameterName = "@projectId",
-                        Value = project.ProjectId
-                    });
-
-                    command.Parameters.Add(new MySqlParameter
-                    {
-                        DbType = DbType.Int32,
-                        ParameterName = "@accountTypeId",
-                        Value = profile is StudentProfile ? 1 : 2 // FIX
-                    });
-
-                    await command.ExecuteNonQueryAsync();
-
-                    int collaboratorProfileId = (int)command.LastInsertedId; // TODO: make long
-
-                    if (profile is StudentProfile sp)
-                    {
-                        commandText = @"INSERT INTO student_profile
-                                    (collaborator_profile_id, cycle, study_year,
-                                     faculty_id, study_program_id, study_program_specialization_id)
-                                    VALUES
-                                    (@collaboratorProfileId, @cycle, @studyYear,
-                                     @facultyId, @studyProgramId, @studyProgramSpecializationId)
-                                    ON DUPLICATE KEY UPDATE collaborator_profile_id = @collaboratorProfileId";
-
-                        command.CommandText = commandText;
-
-                        command.Parameters.Clear();
-
-                        command.Parameters.Add(new MySqlParameter
-                        {
-                            DbType = DbType.Int32,
-                            ParameterName = "@collaboratorProfileId",
-                            Value = collaboratorProfileId
-                        });
-
-                        command.Parameters.Add(new MySqlParameter
-                        {
-                            DbType = DbType.Int32,
-                            ParameterName = "@cycle",
-                            Value = sp.StudyCycle
-                        });
-
-                        command.Parameters.Add(new MySqlParameter
-                        {
-                            DbType = DbType.Int32,
-                            ParameterName = "@studyYear",
-                            Value = sp.StudyYear
-                        });
-
-
-                        command.Parameters.Add(new MySqlParameter
-                        {
-                            DbType = DbType.Int32,
-                            ParameterName = "@facultyId",
-                            Value = sp.Faculty != null ? (int?)((App)App.Current).faculties.GetFacultyId(sp.Faculty) : null
-                        });
-
-                        command.Parameters.Add(new MySqlParameter
-                        {
-                            DbType = DbType.Int32,
-                            ParameterName = "@studyProgramId",
-                            Value = sp.StudyProgram != null ? (int?)((App)App.Current).faculties.GetStudyProgramId(sp.Faculty, sp.StudyProgram) : null
-                        });
-
-                        command.Parameters.Add(new MySqlParameter
-                        {
-                            DbType = DbType.Int32,
-                            ParameterName = "@studyProgramSpecializationId",
-                            Value = sp.StudyProgramSpecialization != null ? (int?)((App)App.Current).faculties.GetStudyProgramSpecializationId(sp.StudyProgram, sp.StudyProgramSpecialization) : null
-                        });
-
-                        await command.ExecuteNonQueryAsync();
-                    }
-
-                    else if (profile is FacultyMemberProfile fp)
-                    {
-                        commandText = @"INSERT INTO faculty_member_profile
-                                    (collaborator_profile_id, faculty_id, study_field_id)
-                                    VALUES
-                                    (@collaboratorProfileId, @facultyId, @studyFieldId)
-                                    ON DUPLICATE KEY UPDATE collaborator_profile_id = @collaboratorProfileId";
-
-                        command.CommandText = commandText;
-
-                        command.Parameters.Clear();
-
-                        command.Parameters.Add(new MySqlParameter
-                        {
-                            DbType = DbType.Int32,
-                            ParameterName = "@collaboratorProfileId",
-                            Value = collaboratorProfileId
-                        });
-
-                        command.Parameters.Add(new MySqlParameter
-                        {
-                            DbType = DbType.Int32,
-                            ParameterName = "@facultyId",
-                            Value = fp.Faculty != null ? (int?)((App)App.Current).faculties.GetFacultyId(fp.Faculty) : null
-                        });
-
-                        command.Parameters.Add(new MySqlParameter
-                        {
-                            DbType = DbType.Int32,
-                            ParameterName = "@studyFieldId",
-                            Value = fp.StudyField != null ? (int?)((App)App.Current).faculties.GetStudyFieldId(fp.StudyField) : null
-                        });
-
-                        await command.ExecuteNonQueryAsync();
-                    }
-                }
-            }
         }
 
         private async Task UpdateProjectTags(MySqlCommand command, Project project)

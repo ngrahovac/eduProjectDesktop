@@ -15,7 +15,7 @@ namespace eduProjectDesktop.Model.Display
         public string ProjectStatus { get; set; }
         public string Title { get; set; }
         public string AuthorFullName { get; set; }
-        public StudyField StudyField { get; set; }
+        public string StudyFieldName { get; set; }
 
         public string Description { get; set; }
         public string StartDate { get; set; }
@@ -31,7 +31,7 @@ namespace eduProjectDesktop.Model.Display
             Title = project.Title;
             if (author != null)
                 AuthorFullName = $"{author.FirstName} {author.LastName}";
-            StudyField = project.StudyField;
+            StudyFieldName = project.StudyField.Name;
             Description = project.Description;
             StartDate = project.StartDate.ToString(); ;
             EndDate = project.EndDate.ToString();

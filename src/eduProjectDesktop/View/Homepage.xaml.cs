@@ -35,6 +35,7 @@ namespace eduProjectDesktop.View
 
             ProjectPageViewModel = new ProjectPageViewModel();
             HomepageViewModel.ProjectPageViewModel = ProjectPageViewModel;
+            ProjectPageViewModel.HomepageViewModel = HomepageViewModel;
 
             SentApplicationsViewModel = new SentApplicationsViewModel();
             HomepageViewModel.SentApplicationsViewModel = SentApplicationsViewModel;

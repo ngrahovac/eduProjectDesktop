@@ -32,11 +32,22 @@ namespace eduProjectDesktop.Model.Display
         public static StudentProfileOverview FromStudentProfile(StudentProfile profile)
         {
             StudentProfileOverview model = new StudentProfileOverview();
-            model.FacultyName = profile.Faculty.Name;
-            model.StudyProgramName = profile.StudyProgram.Name;
-            model.StudyProgramSpecializationName = profile.StudyProgramSpecialization.Name;
-            model.StudyCycle = profile.StudyCycle;
-            model.StudyYear = profile.StudyYear;
+
+            if (profile.Faculty != null)
+            {
+                model.FacultyName = profile.Faculty.Name;
+
+                if (profile.StudyProgram != null)
+                {
+                    model.StudyProgramName = profile.StudyProgram.Name;
+
+                    if (profile.StudyProgramSpecialization != null)
+                        model.StudyProgramSpecializationName = profile.StudyProgramSpecialization.Name;
+                }
+            }
+
+            model.StudyCycle = profile.StudyCycle ?? null;
+            model.StudyYear = profile.StudyYear ?? null;
 
             return model;
         }

@@ -1,5 +1,6 @@
 ﻿using eduProjectDesktop.Model.Display;
 using eduProjectDesktop.Model.Domain;
+using eduProjectDesktop.Model.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,11 +13,15 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
 namespace eduProjectDesktop.ViewModel
 {
     public class ProjectPageViewModel : INotifyPropertyChanged
     {
+
+        public HomepageViewModel HomepageViewModel { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         // controls visibility
@@ -112,14 +117,33 @@ namespace eduProjectDesktop.ViewModel
             }
         }
 
+        public ObservableCollection<string> AddedTags = new ObservableCollection<string>();
         public ObservableCollection<string> SuggestedTags { get; set; } = new ObservableCollection<string>();
 
-        public void TagChosen()
+        public void TagSearched(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            ActiveProjectOverview.Tags.Add(new Tag() { Name = "test tag" });
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                sender.ItemsSource = SuggestedTags.Where(t => t.StartsWith(sender.Text));
+            }
+        }
+        public async void TagChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                if (!AddedTags.Contains((string)args.SelectedItem))
+                {
+                    AddedTags.Add((string)args.SelectedItem);
+                    ProjectInputModel.TagNames.Add((string)args.SelectedItem);
+                }
+            });
+
         }
 
         public Project SelectedProject { get; set; }
+
+        public ProjectInputModel ProjectInputModel;
 
         private Visibility activeProjectVisibility = Visibility.Collapsed;
 
@@ -182,15 +206,24 @@ namespace eduProjectDesktop.ViewModel
         public bool isTagSearchEnabled = false;
         public bool IsTagSearchEnabled { get { return isTagSearchEnabled; } set { isTagSearchEnabled = value; OnPropertyChanged(); } }
 
+        public List<string> StudyFieldNames = new List<string>();
+
+        private string selectedStudyFieldName;
+        public string SelectedStudyFieldName { get { return selectedStudyFieldName; } set { selectedStudyFieldName = value; OnPropertyChanged(); } }
+
         public async Task SetSelectedProject(int id)
         {
-            // setting initial tags
+            // populating combo boxes
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             () =>
             {
                 IEnumerable<Tag> tags = ((App)App.Current).tags.GetAll();
                 foreach (var tag in tags)
                     SuggestedTags.Add(tag.Name);
+
+                IEnumerable<string> studyFieldNames = ((App)App.Current).faculties.GetAllStudyFields().Select(sf => sf.Name);
+                foreach (var name in studyFieldNames)
+                    StudyFieldNames.Add(name);
             });
 
 
@@ -206,7 +239,15 @@ namespace eduProjectDesktop.ViewModel
                     if (SelectedProject.ProjectStatus == ProjectStatus.Active)
                     {
                         ActiveProjectOverview = ActiveProjectOverview.FromProject(SelectedProject, user);
+                        ActiveProjectOverview.SetCollaboratorProfileOverviews(SelectedProject);
                         ActiveProjectVisibility = Visibility.Visible;
+                        SelectedStudyFieldName = ActiveProjectOverview.StudyFieldName;
+
+                        AddedTags.Clear();
+                        foreach (var tag in SelectedProject.Tags)
+                        {
+                            AddedTags.Add(tag.Name);
+                        }
                     }
                     else if (SelectedProject.ProjectStatus == ProjectStatus.Closed)
                     {
@@ -289,7 +330,6 @@ namespace eduProjectDesktop.ViewModel
                 OnPropertyChanged();
             }
         }
-
 
         public async void ApplyForPosition()
         {
@@ -395,24 +435,70 @@ namespace eduProjectDesktop.ViewModel
             await ((App)App.Current).projects.UpdateAsync(SelectedProject);
         }
 
+        private bool isEditEnabled;
+        public bool IsEditEnabled { get { return isEditEnabled; } set { isEditEnabled = value; OnPropertyChanged(); } }
         public async Task EditProjectAsync()
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             () =>
             {
                 IsEditDisabled = false;
+                IsEditEnabled = true;
+
                 IsTagSearchEnabled = true;
+                ProjectInputModel = new ProjectInputModel
+                {
+                    Title = SelectedProject.Title,
+                    Description = SelectedProject.Description,
+                    StudyFieldName = SelectedProject.StudyField.Name
+                };
+
+                if (SelectedProject.StartDate != null)
+                    ProjectInputModel.StartDate = new DateTimeOffset((DateTime)SelectedProject.StartDate);
+                if (SelectedProject.EndDate != null)
+                    ProjectInputModel.EndDate = new DateTimeOffset((DateTime)SelectedProject.EndDate);
+
+                foreach (var tag in SelectedProject.Tags)
+                    ProjectInputModel.TagNames.Add(tag.Name);
+            });
+        }
+
+        public async void StudyFieldSelected(object sender, SelectionChangedEventArgs e)
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                ActiveProjectOverview.StudyFieldName = (string)e.AddedItems.ElementAt(0);
+                selectedStudyFieldName = (string)e.AddedItems.ElementAt(0);
             });
         }
 
         public async void SaveChangesAsync()
         {
-            throw new NotImplementedException();
+            Project project = ProjectInputModel.ToProject(ProjectInputModel);
+            project.ProjectId = SelectedProject.ProjectId;
+
+            await ((App)App.Current).projects.UpdateAsync(project);
+
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+           async () =>
+           {
+               IsEditDisabled = true;
+               IsEditEnabled = false;
+               SelectedProject = await ((App)App.Current).projects.GetAsync(SelectedProject.ProjectId); ;
+           });
+
         }
 
-        public void CancelChangesAsync()
+        public async void CancelChangesAsync()
         {
-            throw new NotImplementedException();
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            async () =>
+            {
+                IsEditDisabled = true;
+                IsEditEnabled = false;
+                await HomepageViewModel.LoadProjects();
+            });
         }
 
 

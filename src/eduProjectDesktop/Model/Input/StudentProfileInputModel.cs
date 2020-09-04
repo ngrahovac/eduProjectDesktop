@@ -36,15 +36,8 @@ namespace eduProjectDesktop.Model.Input
                 }
             }
 
-            if (model.StudyCycle != null)
-            {
-                profile.StudyCycle = model.StudyCycle;
-            }
-
-            if (model.StudyYear != null)
-            {
-                profile.StudyYear = model.StudyYear;
-            }
+            profile.StudyCycle = model.StudyCycle ?? null;
+            profile.StudyYear = model.StudyYear ?? null;
 
             return profile;
         }

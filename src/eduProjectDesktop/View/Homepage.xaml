@@ -29,7 +29,6 @@
             SelectedItem="{x:Bind HomepageViewModel.SelectedMenuItem, Mode=TwoWay}" Grid.ColumnSpan="2">
             <NavigationView.MenuItems>
                 <NavigationViewItem Content="Početna"/>
-                <NavigationViewItem Content="Svi projekti"/>
                 <NavigationViewItem Content="Moji projekti"/>
                 <NavigationViewItem Content="Moje prijave"/>
                 <NavigationViewItem Content="Pristigle prijave"/>
@@ -71,6 +70,7 @@
                             <ColumnDefinition Width="50"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
 
+                        <!-- Active project fields -->
                         <StackPanel
                             Grid.Row="1"
                             Grid.Column="0">
@@ -81,39 +81,60 @@
                             <TextBlock>Status</TextBlock>
                             <TextBlock Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.ProjectStatus, Mode=OneWay}"></TextBlock>
 
-                            <TextBlock >Naziv</TextBlock>
+                            <TextBlock>Naziv</TextBlock>
+                            <TextBlock
+                                Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
+                                Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.Title, Mode=TwoWay}"></TextBlock>
                             <TextBox
-                                IsReadOnly="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
-                                Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.Title, Mode=TwoWay}"></TextBox>
+                                Visibility="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
+                                Text="{x:Bind ProjectPageViewModel.ProjectInputModel.Title, Mode=TwoWay}"></TextBox>
 
-                            <TextBlock >Opis</TextBlock>
-                            <TextBox 
-                                IsReadOnly="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
-                                Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.Description, Mode=TwoWay}"></TextBox>
+
+                            <TextBlock>Opis</TextBlock>
+                            <TextBlock 
+                                Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
+                                Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.Description, Mode=TwoWay}"></TextBlock>
+                            <TextBox
+                                Visibility="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
+                                Text="{x:Bind ProjectPageViewModel.ProjectInputModel.Description, Mode=TwoWay}"></TextBox>
+
 
                             <TextBlock >Autor</TextBlock>
                             <TextBlock
                                Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.AuthorFullName, Mode=OneWay}"></TextBlock>
 
-                            <TextBlock >Naučna oblast</TextBlock>
-
-                            <TextBox
-                                IsReadOnly="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
-                                Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.StudyField.Name, Mode=TwoWay}"></TextBox>
+                            <TextBlock>Naučna oblast</TextBlock>
+                            <TextBlock 
+                                      Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
+                                      Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.StudyFieldName, Mode=OneWay}"></TextBlock>
+                            <ComboBox ItemsSource="{x:Bind ProjectPageViewModel.StudyFieldNames, Mode=OneTime}"
+                                      IsEnabled="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
+                                      Text="{x:Bind ProjectPageViewModel.SelectedStudyFieldName, Mode=OneWay}"
+                                      SelectionChanged="{x:Bind ProjectPageViewModel.StudyFieldSelected}">
+                            </ComboBox>
 
                             <TextBlock >Početak</TextBlock>
                             <TextBox
-                                IsReadOnly="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
+                                Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
                                 Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.StartDate, Mode=TwoWay}"></TextBox>
+                            <DatePicker
+                                Visibility="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
+                                Date="{x:Bind ProjectPageViewModel.ProjectInputModel.StartDate, Mode=TwoWay}">
+                            </DatePicker>
 
                             <TextBlock >Kraj</TextBlock>
                             <TextBox
-                                IsReadOnly="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
+                                Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
                                 Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.EndDate, Mode=TwoWay}"></TextBox>
+                            <DatePicker
+                                Visibility="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
+                                Date="{x:Bind ProjectPageViewModel.ProjectInputModel.EndDate, Mode=TwoWay}">
+                            </DatePicker>
 
-                            <TextBlock >Profili studenata</TextBlock>
+                            <TextBlock Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}">Profili studenata</TextBlock>
                             <ListView 
-                              ItemsSource="{x:Bind ProjectPageViewModel.ActiveProjectOverview.StudentProfileOverviews, Mode=TwoWay}"
+                              Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
+                              ItemsSource="{x:Bind ProjectPageViewModel.ActiveProjectOverview.StudentProfileOverviews, Mode=TwoWay}"                                   
                               SelectionMode="Single"
                               SelectionChanged="{x:Bind ProjectPageViewModel.StudentProfileSelected}"
                               SelectedIndex="{x:Bind ProjectPageViewModel.SelectedStudentProfileIndex, Mode=TwoWay}"
@@ -131,8 +152,9 @@
                                 </ListView.ItemTemplate>
                             </ListView>
 
-                            <TextBlock >Profili nastavnog osoblja</TextBlock>
-                            <ListView 
+                            <TextBlock Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}">Profili nastavnog osoblja</TextBlock>
+                            <ListView
+                              Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
                               ItemsSource="{x:Bind ProjectPageViewModel.ActiveProjectOverview.FacultyMemberProfileOverviews, Mode=OneWay}"
                               SelectionMode="Single"
                               SelectionChanged="{x:Bind ProjectPageViewModel.FacultyMemberProfileSelected}"
@@ -147,28 +169,21 @@
                                         </StackPanel>
                                     </DataTemplate>
                                 </ListView.ItemTemplate>
-
                             </ListView>
-                            <TextBlock >Tagovi</TextBlock>
+
+                            <TextBlock>Tagovi</TextBlock>
                             <GridView
-                                ItemsSource="{x:Bind ProjectPageViewModel.ActiveProjectOverview.Tags, Mode=TwoWay}">
-                                <GridView.ItemTemplate>
-                                    <DataTemplate x:DataType="c1:Tag">
-                                        <TextBlock Text="{x:Bind Name}"></TextBlock>
-                                    </DataTemplate>
-                                </GridView.ItemTemplate>
+                                ItemsSource="{x:Bind ProjectPageViewModel.AddedTags, Mode=OneWay}">
                             </GridView>
                             <AutoSuggestBox
-                                IsEnabled="{x:Bind ProjectPageViewModel.IsTagSearchEnabled, Mode=OneWay}"
-                                ItemsSource="{x:Bind ProjectPageViewModel.SuggestedTags, Mode=TwoWay}"
-                                PlaceholderText="Mmmm"
-                                SuggestionChosen="{x:Bind ProjectPageViewModel.TagChosen}">
-
+                                IsEnabled="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
+                                ItemsSource="{x:Bind ProjectPageViewModel.SuggestedTags, Mode=OneWay}"
+                                SuggestionChosen="{x:Bind ProjectPageViewModel.TagChosen}"
+                                TextChanged="{x:Bind ProjectPageViewModel.TagSearched}">
                             </AutoSuggestBox>
                         </StackPanel>
 
-
-                        <!-- Active project page controls -->
+                        <!-- Active project controls -->
                         <Button
                                 Visibility="{x:Bind ProjectPageViewModel.EditButtonVisibility, Mode=TwoWay}" Grid.ColumnSpan="2" Margin="700,0,0,0" Width="150"
                                 Click="{x:Bind ProjectPageViewModel.EditProjectAsync}">
@@ -212,6 +227,7 @@
                             <ColumnDefinition Width="50"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
 
+                        <!-- Closed project fields-->
                         <Grid x:Name="ClosedProjectDetails"                      
                           Margin="20,20,20,20"
                           Grid.Row="1"
@@ -272,7 +288,7 @@
                             <TextBox Grid.Column="1"
                                Grid.Row="5" 
                                IsReadOnly="True"
-                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.StudyField.Name, Mode=TwoWay}"></TextBox>
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.StudyFieldName, Mode=TwoWay}"></TextBox>
 
                             <TextBlock Grid.Column="0"
                                Grid.Row="6">Početak</TextBlock>
@@ -318,7 +334,7 @@
                             </GridView>
                         </Grid>
 
-                        <!-- Closed project page controls -->
+                        <!-- Closed project controls -->
                         <StackPanel Orientation="Horizontal"                                 
                                     Grid.Row="2"
                                     Grid.Column="0">

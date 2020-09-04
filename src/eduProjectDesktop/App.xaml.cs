@@ -60,7 +60,7 @@ namespace eduProjectDesktop
             {
                 if (rootFrame.Content == null)
                 {
-                    ApplicationView.PreferredLaunchViewSize = new Size(1200, 700);
+                    ApplicationView.PreferredLaunchViewSize = new Size(1920, 1080);
                     ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
 
                     rootFrame.Navigate(typeof(Homepage), e.Arguments);

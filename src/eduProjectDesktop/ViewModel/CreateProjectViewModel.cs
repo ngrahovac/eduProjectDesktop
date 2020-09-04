@@ -255,6 +255,7 @@ namespace eduProjectDesktop.ViewModel
                 }
             });
         }
+
         public void ResetProfile()
         {
             StudentProfileInputModel = new StudentProfileInputModel();

@@ -74,12 +74,9 @@ namespace eduProjectDesktop.ViewModel
                             await LoadProjects();
                             break;
                         }
-                    case "Svi projekti":
-                        {
-                            break;
-                        }
                     case "Moji projekti":
                         {
+                            await LoadMyProjects();
                             break;
                         }
                     case "Pristigle prijave":
@@ -118,14 +115,36 @@ namespace eduProjectDesktop.ViewModel
                     ProjectSnippets.Add(snippet);
                 });
             }
+        }
 
+        public async Task LoadMyProjects()
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                ProjectSnippets.Clear();
+                Visibility.ChangeVisibility(true, "Homepage");
+            });
+
+            IEnumerable<Project> projects = (await ((App)App.Current).projects.GetAllAsync()).Where(p => p.AuthorId == User.CurrentUserId); // TODO: Add GetAllByAuthorId
+
+            foreach (var project in projects)
+            {
+                User author = await ((App)App.Current).users.GetAsync(project.AuthorId);
+                ProjectSnippet snippet = ProjectSnippet.FromProject(project, author);
+
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                () =>
+                {
+                    ProjectSnippets.Add(snippet);
+                });
+            }
         }
 
         public async void ShowProjectPage()
         {
             if (SelectedSnippet != null)
             {
-
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
                 () =>
                 {
@@ -136,13 +155,14 @@ namespace eduProjectDesktop.ViewModel
             }
         }
 
-        // TODO: zasad je samo kad posjetimo project page, pa da se vratimo na homepage
         public async void CloseProjectPage()
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             () =>
             {
                 Visibility.ChangeVisibility(true, "Homepage");
+                ProjectPageViewModel.IsEditDisabled = true;
+                ProjectPageViewModel.IsEditEnabled = false;
                 SelectedSnippetIndex = -1;  // selected index is twoway bound; this deselects list items
             });
         }

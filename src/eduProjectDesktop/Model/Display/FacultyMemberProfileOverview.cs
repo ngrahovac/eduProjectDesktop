@@ -20,7 +20,7 @@ namespace eduProjectDesktop.Model.Display
         {
             FacultyMemberProfileOverview model = new FacultyMemberProfileOverview
             {
-                FacultyName = profile.Faculty.Name,
+                FacultyName = profile.Faculty != null ? profile.Faculty.Name : null,
                 StudyFieldName = profile.StudyField != null ? profile.StudyField.Name : null
             };
 

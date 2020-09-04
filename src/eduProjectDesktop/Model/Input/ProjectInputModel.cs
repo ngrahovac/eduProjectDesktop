@@ -11,15 +11,18 @@ using System.Threading.Tasks;
 
 namespace eduProjectDesktop.Model.Input
 {
-    public class ProjectInputModel
+    public class ProjectInputModel : INotifyPropertyChanged
     {
-        public string Title { get; set; }
+        private string title;
+        public string Title { get { return title; } set { title = value; OnPropertyChanged(); } }
         public string Description { get; set; }
         public string StudyFieldName { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
         public List<string> TagNames { get; set; } = new List<string>();
         public List<CollaboratorProfileInputModel> CollaboratorProfileInputModels { get; set; } = new List<CollaboratorProfileInputModel>();
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public static Project ToProject(ProjectInputModel model)
         {
@@ -62,5 +65,9 @@ namespace eduProjectDesktop.Model.Input
             return project;
         }
 
+        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }
