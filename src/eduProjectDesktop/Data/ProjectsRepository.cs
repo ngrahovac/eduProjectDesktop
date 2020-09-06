@@ -742,5 +742,34 @@ namespace eduProjectDesktop.Data
             }
         }
 
+        public async Task DeleteProjectAsync(Project project)
+        {
+            if (project.ProjectId == User.CurrentUserId)
+            {
+                string commandText = "DELETE FROM project WHERE project_id = @projectId";
+
+                MySqlCommand command = new MySqlCommand
+                {
+                    CommandText = commandText
+                };
+
+                command.Parameters.Add(new MySqlParameter
+                {
+                    DbType = DbType.Int32,
+                    ParameterName = "@projectId",
+                    Value = project.ProjectId
+                });
+
+                using (var connection = new MySqlConnection(Config.dbConnectionString))
+                {
+                    await connection.OpenAsync();
+                    command.Connection = connection;
+
+                    await command.ExecuteNonQueryAsync();
+
+                    await connection.CloseAsync();
+                }
+            }
+        }
     }
 }

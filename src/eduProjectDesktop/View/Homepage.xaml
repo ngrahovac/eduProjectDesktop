@@ -11,13 +11,9 @@
     xmlns:c2="using:eduProjectDesktop.Model.Input"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-    Loaded="{x:Bind HomepageViewModel.LoadProjects}" d:DesignWidth="1178.116" d:DesignHeight="1022.654">
+    Loaded="{x:Bind HomepageViewModel.LoadProjects}" d:DesignWidth="1920" d:DesignHeight="1000">
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0*"/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
         <NavigationView
             PaneDisplayMode="Top"
             IsSettingsVisible="False"     
@@ -25,16 +21,514 @@
             IsBackEnabled="True"
             BackRequested="{x:Bind HomepageViewModel.CloseProjectPage}"
             Header="{x:Bind HomepageViewModel.SectionName, Mode=OneWay}"
-            SelectionChanged="{x:Bind HomepageViewModel.MenuItemSelectionChanged}"
-            SelectedItem="{x:Bind HomepageViewModel.SelectedMenuItem, Mode=TwoWay}" Grid.ColumnSpan="2">
-            <NavigationView.MenuItems>
-                <NavigationViewItem Content="Početna"/>
-                <NavigationViewItem Content="Moji projekti"/>
-                <NavigationViewItem Content="Moje prijave"/>
-                <NavigationViewItem Content="Pristigle prijave"/>
-                <NavigationViewItem Content="Novi projekat"/>
-            </NavigationView.MenuItems>
+            MenuItemsSource="{x:Bind HomepageViewModel.NavigationItems, Mode=OneWay}"
+            SelectionChanged="{x:Bind HomepageViewModel.MenuItemSelectionChanged}">
+
             <StackPanel>
+                <!-- Project page -->
+                <Grid 
+                      ColumnSpacing="30"
+                      HorizontalAlignment="Left"
+                      Width="1800"
+                    Margin="30,30,0,0"
+                    Visibility="{x:Bind HomepageViewModel.Visibility.ProjectPageVisibility, Mode=OneWay}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition Height="200"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="600"></ColumnDefinition>
+                        <ColumnDefinition Width="600"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Active project overview -->
+                    <StackPanel                            
+                        Visibility="{x:Bind ProjectPageViewModel.ActiveProjectVisibility, Mode=OneWay}"
+                        Grid.Row="0"
+                        Spacing="5">
+
+                        <TextBlock>ID</TextBlock>
+                        <TextBox
+                            IsReadOnly="True"                          
+                            Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.ProjectId, Mode=OneWay}"></TextBox>
+
+                        <TextBlock>Status</TextBlock>
+                        <TextBox 
+                            IsReadOnly="True"
+                            Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.ProjectStatus, Mode=OneWay}"></TextBox>
+
+                        <TextBlock>Naziv</TextBlock>
+
+                        <!--TextBlock
+                                Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
+                                Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.Title, Mode=TwoWay}" -->
+                        <TextBox
+                            IsReadOnly="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
+                            PlaceholderText="{x:Bind ProjectPageViewModel.ActiveProjectOverview.Title, Mode=OneWay}"
+                            Text="{x:Bind ProjectPageViewModel.ProjectInputModel.Title, Mode=TwoWay}"></TextBox>
+
+
+                        <TextBlock>Opis</TextBlock>
+                        <TextBox
+                            IsReadOnly="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
+                            PlaceholderText="{x:Bind ProjectPageViewModel.ActiveProjectOverview.Description, Mode=TwoWay}"
+                            Text="{x:Bind ProjectPageViewModel.ProjectInputModel.Description, Mode=TwoWay}"></TextBox>
+
+                        <TextBlock >Autor</TextBlock>
+                        <TextBlock
+                               Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.AuthorFullName, Mode=OneWay}"></TextBlock>
+
+                        <TextBlock>Naučna oblast</TextBlock>
+                        <TextBlock 
+                                      Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
+                                      Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.StudyFieldName, Mode=OneWay}"></TextBlock>
+                        <ComboBox ItemsSource="{x:Bind ProjectPageViewModel.StudyFieldNames, Mode=OneTime}"
+                                      IsEnabled="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
+                                      Text="{x:Bind ProjectPageViewModel.SelectedStudyFieldName, Mode=OneWay}"
+                                      SelectionChanged="{x:Bind ProjectPageViewModel.StudyFieldSelected}">
+                        </ComboBox>
+
+                        <TextBlock>Početak</TextBlock>
+                        <TextBlock
+                                Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
+                                Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.StartDate, Mode=TwoWay}"></TextBlock>
+                        <DatePicker
+                                Visibility="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
+                                Date="{x:Bind ProjectPageViewModel.ProjectInputModel.StartDate, Mode=TwoWay}">
+                        </DatePicker>
+
+                        <TextBlock>Kraj</TextBlock>
+                        <TextBlock
+                                Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
+                                Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.EndDate, Mode=TwoWay}"></TextBlock>
+                        <DatePicker
+                                Visibility="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
+                                Date="{x:Bind ProjectPageViewModel.ProjectInputModel.EndDate, Mode=TwoWay}">
+                        </DatePicker>
+
+                        <TextBlock>Tagovi</TextBlock>
+                        <GridView
+                                ItemsSource="{x:Bind ProjectPageViewModel.AddedTags, Mode=OneWay}"
+                                IsItemClickEnabled="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
+                                ItemClick="{x:Bind ProjectPageViewModel.TagRemoved}">
+                        </GridView>
+                        <AutoSuggestBox
+                                IsEnabled="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
+                                ItemsSource="{x:Bind ProjectPageViewModel.SuggestedTags, Mode=OneWay}"
+                                SuggestionChosen="{x:Bind ProjectPageViewModel.TagChosen}"
+                                TextChanged="{x:Bind ProjectPageViewModel.TagSearched}">
+                        </AutoSuggestBox>
+                    </StackPanel>
+
+                    <!-- Active project collaborator profiles overview -->
+                    <StackPanel
+                        Visibility="{x:Bind ProjectPageViewModel.ActiveProjectVisibility, Mode=OneWay}"
+                        Grid.Row="0"
+                        Grid.Column="1">
+
+                        <TextBlock Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}">Profili studenata</TextBlock>
+                        <ScrollViewer 
+                            VerticalScrollBarVisibility="Visible"
+                            VerticalScrollMode="Enabled">
+                            <ListView 
+                              Height="300"
+                              Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
+                              ItemsSource="{x:Bind ProjectPageViewModel.ActiveProjectOverview.StudentProfileOverviews, Mode=TwoWay}"                                   
+                              SelectionMode="Single"
+                              SelectionChanged="{x:Bind ProjectPageViewModel.StudentProfileSelected}"
+                              SelectedIndex="{x:Bind ProjectPageViewModel.SelectedStudentProfileIndex, Mode=TwoWay}"
+                              SelectedItem="{x:Bind ProjectPageViewModel.SelectedStudentProfileOverview, Mode=TwoWay}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="c:StudentProfileOverview">
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Text="{x:Bind Description}"></TextBlock>
+                                            <TextBlock Text="{x:Bind FacultyName}"></TextBlock>
+                                            <TextBlock Text="{x:Bind StudyProgramName}"></TextBlock>
+                                            <TextBlock Text="{x:Bind StudyProgramSpecializationName}"></TextBlock>
+                                            <TextBlock Text="{x:Bind StudyYear}"></TextBlock>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </ScrollViewer>
+
+
+                        <TextBlock Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}">Profili nastavnog osoblja</TextBlock>
+                        <ScrollViewer 
+                            VerticalScrollBarVisibility="Visible"
+                            VerticalScrollMode="Enabled">
+                            <ListView
+                              Height="300"
+                              Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
+                              ItemsSource="{x:Bind ProjectPageViewModel.ActiveProjectOverview.FacultyMemberProfileOverviews, Mode=OneWay}"
+                              SelectionMode="Single"
+                              SelectionChanged="{x:Bind ProjectPageViewModel.FacultyMemberProfileSelected}"
+                              SelectedIndex="{x:Bind ProjectPageViewModel.SelectedFacultyMemberProfileIndex, Mode=TwoWay}"
+                              SelectedItem="{x:Bind ProjectPageViewModel.SelectedFacultyMemberProfileOverview, Mode=TwoWay}">
+
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="c:FacultyMemberProfileOverview">
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Text="{x:Bind Description}"></TextBlock>
+                                            <TextBlock Text="{x:Bind FacultyName}"></TextBlock>
+                                            <TextBlock Text="{x:Bind StudyFieldName}"></TextBlock>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </ScrollViewer>
+
+                    </StackPanel>
+
+                    <!-- Closed project overview -->
+                    <StackPanel 
+                        Visibility="{x:Bind ProjectPageViewModel.ClosedProjectVisibility, Mode=OneWay}"
+                        Grid.Row="0"
+                        Spacing="5">
+
+                        <TextBlock>ID</TextBlock>
+                        <TextBlock Grid.Column="1"
+                               Grid.Row="0"
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.ProjectId, Mode=OneWay}"></TextBlock>
+
+                        <TextBlock>Status</TextBlock>
+                        <TextBlock Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.ProjectStatus, Mode=OneWay}"></TextBlock>
+
+                        <TextBlock>Naziv</TextBlock>
+                        <TextBox 
+                                IsReadOnly="True"
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.Title, Mode=TwoWay}"></TextBox>
+
+                        <TextBlock>Opis</TextBlock>
+                        <TextBox
+                                IsReadOnly="True"
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.Description, Mode=TwoWay}"></TextBox>
+
+                        <TextBlock>Autor</TextBlock>
+                        <TextBlock                                
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.AuthorFullName, Mode=OneWay}"></TextBlock>
+
+                        <TextBlock>Naučna oblast</TextBlock>
+
+                        <TextBox  
+                               IsReadOnly="True"
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.StudyFieldName, Mode=TwoWay}"></TextBox>
+
+                        <TextBlock>Početak</TextBlock>
+                        <TextBox 
+                               IsReadOnly="True"
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.StartDate, Mode=TwoWay}"></TextBox>
+
+                        <TextBlock>Kraj</TextBlock>
+                        <TextBox
+                               IsReadOnly="True"
+                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.EndDate, Mode=TwoWay}"></TextBox>
+
+                        <TextBlock>Saradnici na projektu</TextBlock>
+                        <ScrollViewer 
+                            VerticalScrollBarVisibility="Visible"
+                            VerticalScrollMode="Enabled">
+                            <ListView 
+                                Height="500"
+                                ItemsSource="{x:Bind ProjectPageViewModel.ClosedProjectOverview.CollaboratorOverviews, Mode=OneWay}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="c:CollaboratorOverview">
+                                        <StackPanel 
+                                            Orientation="Horizontal"
+                                            Spacing="5">
+                                            <TextBlock Text="{x:Bind FirstName}"></TextBlock>
+                                            <TextBlock Text="{x:Bind LastName}"></TextBlock>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </ScrollViewer>
+
+                        <TextBlock>Tagovi</TextBlock>
+                        <GridView
+                                ItemsSource="{x:Bind ProjectPageViewModel.ClosedProjectOverview.Tags, Mode=OneWay}">
+                            <GridView.ItemTemplate>
+                                <DataTemplate x:DataType="c1:Tag">
+                                    <TextBlock Text="{x:Bind Name}"></TextBlock>
+                                </DataTemplate>
+                            </GridView.ItemTemplate>
+                        </GridView>
+                    </StackPanel>
+
+                    <!-- Project controls -->
+                    <StackPanel Orientation="Horizontal"                                 
+                                Grid.Row="1"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Spacing="5">
+
+                        <Button
+                            Visibility="{x:Bind ProjectPageViewModel.EditButtonVisibility, Mode=TwoWay}"
+                            Click="{x:Bind ProjectPageViewModel.EditProjectAsync}">
+                            Izmijeni projekat
+                        </Button>
+
+                        <Button
+                            Visibility="{x:Bind ProjectPageViewModel.DeleteButtonVisibility, Mode=TwoWay}"
+                            Click="{x:Bind ProjectPageViewModel.DeleteProjectAsync}">
+                            Obriši projekat
+                        </Button>
+
+                        <Button 
+                            Visibility="{x:Bind ProjectPageViewModel.ApplyButtonVisibility, Mode=TwoWay}"
+                            Click="{x:Bind ProjectPageViewModel.ApplyForPosition}">
+                            Prijavi se
+                        </Button>
+
+                        <Button 
+                            Visibility="{x:Bind ProjectPageViewModel.RevokeButtonVisibility, Mode=TwoWay}"
+                            Click="{x:Bind ProjectPageViewModel.RevokeApplicationAsync}">
+                            Odustani
+                        </Button>
+
+                        <Button 
+                            Visibility="{x:Bind ProjectPageViewModel.CloseProjectButtonVisibility, Mode=TwoWay}"
+                            Click="{x:Bind ProjectPageViewModel.CloseProjectAsync}">
+                            Zatvori projekat
+                        </Button>
+
+                        <Button 
+                            Visibility="{x:Bind ProjectPageViewModel.SaveButtonVisibility, Mode=TwoWay}"
+                            IsEnabled="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"                                    
+                            Click="{x:Bind ProjectPageViewModel.SaveChangesAsync}">
+                            Sačuvaj
+                        </Button>
+
+                        <Button
+                            Visibility="{x:Bind ProjectPageViewModel.CancelButtonVisibility, Mode=TwoWay}"
+                            IsEnabled="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
+                            Click="{x:Bind ProjectPageViewModel.CancelChangesAsync}">
+                            Odustani
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <!-- New project -->
+                <Grid 
+                      ColumnSpacing="30"
+                      HorizontalAlignment="Left"
+                      Width="1800"
+                      Height="960"
+                      Visibility="{x:Bind HomepageViewModel.Visibility.CreateProjectVisibility, Mode=OneWay}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition Height="200"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="600"></ColumnDefinition>
+                        <ColumnDefinition Width="600"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Basic information -->
+                    <StackPanel
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Width="500"
+                            Spacing="5"
+                            Margin="30,30,0,0"
+                            HorizontalAlignment="Left">
+
+                        <TextBlock>Naziv</TextBlock>
+                        <TextBox 
+                                Text="{x:Bind CreateProjectViewModel.ProjectInputModel.Title, Mode=TwoWay}">
+                        </TextBox>
+
+                        <TextBlock>Opis</TextBlock>
+                        <TextBox 
+                                Text="{x:Bind CreateProjectViewModel.ProjectInputModel.Description, Mode=TwoWay}"></TextBox>
+
+                        <TextBlock>Naučna oblast</TextBlock>
+                        <ComboBox ItemsSource="{x:Bind CreateProjectViewModel.StudyFieldNames, Mode=OneTime}"
+                                      SelectedItem="{x:Bind CreateProjectViewModel.SelectedProjectStudyFieldName, Mode=TwoWay}">
+                        </ComboBox>
+
+                        <DatePicker Header="Početak" Date="{x:Bind CreateProjectViewModel.ProjectInputModel.StartDate, Mode=TwoWay}"/>
+
+                        <DatePicker Header="Kraj" Date="{x:Bind CreateProjectViewModel.ProjectInputModel.EndDate, Mode=TwoWay}"/>
+
+                        <TextBlock>Tagovi</TextBlock>
+                        <GridView Height="100"
+                                ItemsSource="{x:Bind CreateProjectViewModel.AddedTags, Mode=OneWay}"
+                                IsItemClickEnabled="True"
+                                ItemClick="{x:Bind CreateProjectViewModel.TagRemoved}">
+                        </GridView>
+                        <AutoSuggestBox 
+                                ItemsSource="{x:Bind CreateProjectViewModel.TagNames, Mode=OneTime}"
+                                SuggestionChosen="{x:Bind CreateProjectViewModel.TagChosen}"
+                                TextChanged="{x:Bind CreateProjectViewModel.TagSearched}">
+                        </AutoSuggestBox>
+                    </StackPanel>
+
+                    <!-- Collaborator profiles -->
+                    <Grid
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Width="500"
+                        Height="900"
+                        Margin="0,30,0,0"
+                        HorizontalAlignment="Left">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="500"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="500"></RowDefinition>
+                            <RowDefinition Height="260"></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel
+                            Grid.Row="0"                           
+                            Width="500"
+                            Spacing="5"
+                            HorizontalAlignment="Left" Grid.RowSpan="2" VerticalAlignment="Top">
+                            <TextBlock>Tip profila</TextBlock>
+                            <ComboBox 
+                                ItemsSource="{x:Bind CreateProjectViewModel.CollaboratorProfileTypes, Mode=OneTime}"
+                                SelectionChanged="{x:Bind CreateProjectViewModel.CollaboratorProfileTypeChosenAsync}">
+                            </ComboBox>
+
+                            <TextBlock>Opis pozicije</TextBlock>
+                            <TextBox Text="{x:Bind CreateProjectViewModel.ProfileDescription, Mode=TwoWay}"></TextBox>
+
+                            <!-- Creating student profile -->
+                            <TextBlock Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}">Fakultet</TextBlock>
+                            <AutoSuggestBox
+                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}"
+                                ItemsSource="{x:Bind CreateProjectViewModel.FacultyNames, Mode=OneTime}"
+                                SuggestionChosen="{x:Bind CreateProjectViewModel.FacultyChosenAsync}"
+                                TextChanged="{x:Bind CreateProjectViewModel.FacultySearched}">
+                            </AutoSuggestBox>
+                            <TextBlock 
+                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}">Ciklus</TextBlock>
+                            <ComboBox 
+                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}"
+                                ItemsSource="{x:Bind CreateProjectViewModel.StudyCycles}"
+                                SelectionChanged="{x:Bind CreateProjectViewModel.CycleChosenAsync}">
+                            </ComboBox>
+
+                            <TextBlock
+                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}">Program</TextBlock>
+                            <AutoSuggestBox
+                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}"
+                                ItemsSource="{x:Bind CreateProjectViewModel.ProgramNames, Mode=OneWay}"
+                                SuggestionChosen="{x:Bind CreateProjectViewModel.ProgramChosenAsync}"
+                                TextChanged="{x:Bind CreateProjectViewModel.ProgramSearched}">
+                            </AutoSuggestBox>
+                            <TextBlock
+                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}">Smjer</TextBlock>
+                            <AutoSuggestBox
+                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}"
+                                ItemsSource="{x:Bind CreateProjectViewModel.SpecializationNames, Mode=OneWay}"
+                                SuggestionChosen="{x:Bind CreateProjectViewModel.SpecializationChosen}"
+                                TextChanged="{x:Bind CreateProjectViewModel.SpecializationSearched}">
+                            </AutoSuggestBox>
+                            <TextBlock
+                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}">Godina</TextBlock>
+                            <ComboBox
+                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}"
+                                ItemsSource="{x:Bind CreateProjectViewModel.StudyYears, Mode=OneWay}"
+                                SelectionChanged="{x:Bind CreateProjectViewModel.StudyYearChosenAsync}">
+                            </ComboBox>
+
+                            <!-- Creating faculty member profiles-->
+                            <TextBlock
+                                Visibility="{x:Bind CreateProjectViewModel.CreatingFacultyMemberProfile, Mode=OneWay}">Fakultet</TextBlock>
+                            <AutoSuggestBox
+                                Visibility="{x:Bind CreateProjectViewModel.CreatingFacultyMemberProfile, Mode=OneWay}"
+                                ItemsSource="{x:Bind CreateProjectViewModel.FacultyNames, Mode=OneTime}"
+                                SuggestionChosen="{x:Bind CreateProjectViewModel.FacultyChosenAsync}"
+                                TextChanged="{x:Bind CreateProjectViewModel.FacultySearched}">
+                            </AutoSuggestBox>
+
+
+                            <TextBlock
+                                Visibility="{x:Bind CreateProjectViewModel.CreatingFacultyMemberProfile, Mode=OneWay}">Naučna oblast</TextBlock>
+                            <ComboBox 
+                                Visibility="{x:Bind CreateProjectViewModel.CreatingFacultyMemberProfile, Mode=OneWay}"
+                                ItemsSource="{x:Bind CreateProjectViewModel.StudyFieldNames, Mode=OneTime}"
+                                      SelectedItem="{x:Bind CreateProjectViewModel.SelectedFacultyMemberStudyFieldName, Mode=TwoWay}">
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Added profiles -->
+                    <StackPanel
+                            Grid.Column="2"
+                            Grid.Row="0"
+                            Spacing="5"
+                            Width="500"
+                            HorizontalAlignment="Left"
+                            Margin="0,30,0,0">
+
+                        <TextBlock>Dodani studentski profili</TextBlock>
+                        <ScrollViewer VerticalScrollBarVisibility="Visible">
+                            <ListView Height="300"
+                            ItemsSource="{x:Bind CreateProjectViewModel.StudentProfileInputModels}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="c2:StudentProfileInputModel">
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Text="{x:Bind Description}"></TextBlock>
+                                            <TextBlock Text="{x:Bind FacultyName}"></TextBlock>
+                                            <TextBlock Text="{x:Bind StudyProgramName}"></TextBlock>
+                                            <TextBlock Text="{x:Bind StudyProgramSpecializationName}"></TextBlock>
+                                            <TextBlock Text="{x:Bind StudyYear}"></TextBlock>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </ScrollViewer>
+
+                        <TextBlock>Dodani profili nastavnog osoblja</TextBlock>
+                        <ScrollViewer VerticalScrollBarVisibility="Visible" VerticalScrollMode="Enabled">
+                            <ListView Height="300"
+                            ItemsSource="{x:Bind CreateProjectViewModel.FacultyMemberProfileInputModels}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="c2:FacultyMemberProfileInputModel">
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Text="{x:Bind Description}"></TextBlock>
+                                            <TextBlock Text="{x:Bind FacultyName}"></TextBlock>
+                                            <TextBlock Text="{x:Bind StudyFieldName}"></TextBlock>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </ScrollViewer>
+                    </StackPanel>
+
+                    <!-- Collaborator profiles controls -->
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        Width="500"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Margin="0,0,0,0"
+                        Grid.Row="1"
+                        Grid.Column="1">
+                        <Button
+                                Click="{x:Bind CreateProjectViewModel.AddProfile}">Dodaj profil</Button>
+                    </StackPanel>
+
+                    <!-- Create project page controls -->
+                    <StackPanel Orientation="Horizontal"                                 
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Margin="30,0,0,0">
+                        <Button Margin="5"
+                                Click="{x:Bind CreateProjectViewModel.SaveProject}"
+                                    >Sačuvaj</Button>
+                        <Button Margin="5"
+                                    >Odustani</Button>
+                    </StackPanel>
+                </Grid>
+
                 <!-- All projects -->
                 <ListView x:Name="ProjectsList" ItemsSource="{x:Bind HomepageViewModel.ProjectSnippets, Mode=OneWay}"
                       Visibility="{x:Bind HomepageViewModel.Visibility.HomepageVisibility, Mode=OneWay}"
@@ -42,6 +536,11 @@
                       SelectedItem="{x:Bind HomepageViewModel.SelectedSnippet, Mode=TwoWay}"
                       SelectedIndex="{x:Bind HomepageViewModel.SelectedSnippetIndex, Mode=TwoWay}">
 
+                    <ListView.Resources>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Margin" Value="10"/>
+                        </Style>
+                    </ListView.Resources>
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="c:ProjectSnippet">
                             <StackPanel>
@@ -55,298 +554,6 @@
                     </ListView.ItemTemplate>
                 </ListView>
 
-                <!-- Project page -->
-                <StackPanel Visibility="{x:Bind HomepageViewModel.Visibility.ProjectPageVisibility, Mode=OneWay}">
-                    <!-- Active project overview -->
-                    <Grid Visibility="{x:Bind ProjectPageViewModel.ActiveProjectVisibility, Mode=OneWay}" Width="850"
-                      Margin="20">
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="800"></ColumnDefinition>
-                            <ColumnDefinition Width="50"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Active project fields -->
-                        <StackPanel
-                            Grid.Row="1"
-                            Grid.Column="0">
-                            <TextBlock>ID</TextBlock>
-                            <TextBlock                                       
-                                Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.ProjectId, Mode=OneWay}"></TextBlock>
-
-                            <TextBlock>Status</TextBlock>
-                            <TextBlock Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.ProjectStatus, Mode=OneWay}"></TextBlock>
-
-                            <TextBlock>Naziv</TextBlock>
-                            <TextBlock
-                                Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
-                                Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.Title, Mode=TwoWay}"></TextBlock>
-                            <TextBox
-                                Visibility="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
-                                Text="{x:Bind ProjectPageViewModel.ProjectInputModel.Title, Mode=TwoWay}"></TextBox>
-
-
-                            <TextBlock>Opis</TextBlock>
-                            <TextBlock 
-                                Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
-                                Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.Description, Mode=TwoWay}"></TextBlock>
-                            <TextBox
-                                Visibility="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
-                                Text="{x:Bind ProjectPageViewModel.ProjectInputModel.Description, Mode=TwoWay}"></TextBox>
-
-
-                            <TextBlock >Autor</TextBlock>
-                            <TextBlock
-                               Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.AuthorFullName, Mode=OneWay}"></TextBlock>
-
-                            <TextBlock>Naučna oblast</TextBlock>
-                            <TextBlock 
-                                      Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
-                                      Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.StudyFieldName, Mode=OneWay}"></TextBlock>
-                            <ComboBox ItemsSource="{x:Bind ProjectPageViewModel.StudyFieldNames, Mode=OneTime}"
-                                      IsEnabled="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
-                                      Text="{x:Bind ProjectPageViewModel.SelectedStudyFieldName, Mode=OneWay}"
-                                      SelectionChanged="{x:Bind ProjectPageViewModel.StudyFieldSelected}">
-                            </ComboBox>
-
-                            <TextBlock >Početak</TextBlock>
-                            <TextBox
-                                Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
-                                Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.StartDate, Mode=TwoWay}"></TextBox>
-                            <DatePicker
-                                Visibility="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
-                                Date="{x:Bind ProjectPageViewModel.ProjectInputModel.StartDate, Mode=TwoWay}">
-                            </DatePicker>
-
-                            <TextBlock >Kraj</TextBlock>
-                            <TextBox
-                                Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
-                                Text="{x:Bind ProjectPageViewModel.ActiveProjectOverview.EndDate, Mode=TwoWay}"></TextBox>
-                            <DatePicker
-                                Visibility="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
-                                Date="{x:Bind ProjectPageViewModel.ProjectInputModel.EndDate, Mode=TwoWay}">
-                            </DatePicker>
-
-                            <TextBlock Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}">Profili studenata</TextBlock>
-                            <ListView 
-                              Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
-                              ItemsSource="{x:Bind ProjectPageViewModel.ActiveProjectOverview.StudentProfileOverviews, Mode=TwoWay}"                                   
-                              SelectionMode="Single"
-                              SelectionChanged="{x:Bind ProjectPageViewModel.StudentProfileSelected}"
-                              SelectedIndex="{x:Bind ProjectPageViewModel.SelectedStudentProfileIndex, Mode=TwoWay}"
-                              SelectedItem="{x:Bind ProjectPageViewModel.SelectedStudentProfileOverview, Mode=TwoWay}">
-                                <ListView.ItemTemplate>
-                                    <DataTemplate x:DataType="c:StudentProfileOverview">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{x:Bind FacultyName}"></TextBlock>
-                                            <TextBlock Text="{x:Bind StudyProgramName}"></TextBlock>
-                                            <TextBlock Text="{x:Bind StudyProgramSpecializationName}"></TextBlock>
-                                            <TextBlock Text="{x:Bind StudyCycle}"></TextBlock>
-                                            <TextBlock Text="{x:Bind StudyYear}"></TextBlock>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
-
-                            <TextBlock Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}">Profili nastavnog osoblja</TextBlock>
-                            <ListView
-                              Visibility="{x:Bind ProjectPageViewModel.IsEditDisabled, Mode=OneWay}"
-                              ItemsSource="{x:Bind ProjectPageViewModel.ActiveProjectOverview.FacultyMemberProfileOverviews, Mode=OneWay}"
-                              SelectionMode="Single"
-                              SelectionChanged="{x:Bind ProjectPageViewModel.FacultyMemberProfileSelected}"
-                              SelectedIndex="{x:Bind ProjectPageViewModel.SelectedFacultyMemberProfileIndex, Mode=TwoWay}"
-                              SelectedItem="{x:Bind ProjectPageViewModel.SelectedFacultyMemberProfileOverview, Mode=TwoWay}">
-
-                                <ListView.ItemTemplate>
-                                    <DataTemplate x:DataType="c:FacultyMemberProfileOverview">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{x:Bind FacultyName}"></TextBlock>
-                                            <TextBlock Text="{x:Bind StudyFieldName}"></TextBlock>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
-
-                            <TextBlock>Tagovi</TextBlock>
-                            <GridView
-                                ItemsSource="{x:Bind ProjectPageViewModel.AddedTags, Mode=OneWay}"
-                                IsItemClickEnabled="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
-                                ItemClick="{x:Bind ProjectPageViewModel.TagRemoved}">
-                            </GridView>
-                            <AutoSuggestBox
-                                IsEnabled="{x:Bind ProjectPageViewModel.IsEditEnabled, Mode=OneWay}"
-                                ItemsSource="{x:Bind ProjectPageViewModel.SuggestedTags, Mode=OneWay}"
-                                SuggestionChosen="{x:Bind ProjectPageViewModel.TagChosen}"
-                                TextChanged="{x:Bind ProjectPageViewModel.TagSearched}">
-                            </AutoSuggestBox>
-                        </StackPanel>
-
-                        <!-- Active project controls -->
-                        <Button
-                                Visibility="{x:Bind ProjectPageViewModel.EditButtonVisibility, Mode=TwoWay}" Grid.ColumnSpan="2" Margin="700,0,0,0" Width="150"
-                                Click="{x:Bind ProjectPageViewModel.EditProjectAsync}">
-                            Izmijeni projekat</Button>
-
-                        <StackPanel Orientation="Horizontal"                                 
-                                Grid.Row="2"
-                            Grid.Column="0">
-                            <Button Margin="5"
-                                    Click="{x:Bind ProjectPageViewModel.ApplyForPosition}"
-                                    Visibility="{x:Bind ProjectPageViewModel.ApplyButtonVisibility, Mode=TwoWay}">Prijavi se</Button>
-                            <Button Margin="5"
-                                    Visibility="{x:Bind ProjectPageViewModel.RevokeButtonVisibility, Mode=TwoWay}">Odustani</Button>
-                            <Button Margin="5"
-                                    Visibility="{x:Bind ProjectPageViewModel.DeleteButtonVisibility, Mode=TwoWay}">Obriši projekat</Button>
-                            <Button Margin="5"
-                                    Visibility="{x:Bind ProjectPageViewModel.CloseProjectButtonVisibility, Mode=TwoWay}"
-                                    Click="{x:Bind ProjectPageViewModel.CloseProjectAsync}">Zatvori projekat</Button>
-                            <Button Margin="5"
-                                    Visibility="{x:Bind ProjectPageViewModel.SaveButtonVisibility, Mode=TwoWay}"
-                                    Click="{x:Bind ProjectPageViewModel.SaveChangesAsync}">Sačuvaj</Button>
-                            <Button Margin="5"
-                                    Visibility="{x:Bind ProjectPageViewModel.CancelButtonVisibility, Mode=TwoWay}"
-                                    Click="{x:Bind ProjectPageViewModel.CancelChangesAsync}">Odustani</Button>
-
-
-                        </StackPanel>
-
-                    </Grid>
-
-                    <!-- Closed project overview -->
-                    <Grid Visibility="{x:Bind ProjectPageViewModel.ClosedProjectVisibility, Mode=OneWay}" Width="850"
-                      Margin="20">
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="800"></ColumnDefinition>
-                            <ColumnDefinition Width="50"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Closed project fields-->
-                        <Grid x:Name="ClosedProjectDetails"                      
-                          Margin="20,20,20,20"
-                          Grid.Row="1"
-                          Grid.Column="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="150" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Column="0"
-                               Grid.Row="0">ID</TextBlock>
-                            <TextBlock Grid.Column="1"
-                               Grid.Row="0"
-                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.ProjectId, Mode=OneWay}"></TextBlock>
-
-                            <TextBlock Grid.Column="0"
-                               Grid.Row="1">Status</TextBlock>
-                            <TextBlock Grid.Column="1"
-                               Grid.Row="1"
-                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.ProjectStatus, Mode=OneWay}"></TextBlock>
-
-                            <TextBlock Grid.Column="0"
-                               Grid.Row="2">Naziv</TextBlock>
-                            <TextBox Grid.Column="1"
-                               Grid.Row="2"
-                               IsReadOnly="True"
-                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.Title, Mode=TwoWay}"></TextBox>
-
-                            <TextBlock Grid.Column="0"
-                               Grid.Row="3">Opis</TextBlock>
-                            <TextBox Grid.Column="1"
-                               Grid.Row="3"
-                               IsReadOnly="True"
-                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.Description, Mode=TwoWay}"></TextBox>
-
-                            <TextBlock Grid.Column="0"
-                               Grid.Row="4">Autor</TextBlock>
-                            <TextBlock Grid.Column="1"
-                               Grid.Row="4"
-                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.AuthorFullName, Mode=OneWay}"></TextBlock>
-
-                            <TextBlock Grid.Column="0"
-                               Grid.Row="5">Naučna oblast</TextBlock>
-
-                            <TextBox Grid.Column="1"
-                               Grid.Row="5" 
-                               IsReadOnly="True"
-                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.StudyFieldName, Mode=TwoWay}"></TextBox>
-
-                            <TextBlock Grid.Column="0"
-                               Grid.Row="6">Početak</TextBlock>
-                            <TextBox Grid.Column="1"
-                               Grid.Row="6"
-                               IsReadOnly="True"
-                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.StartDate, Mode=TwoWay}"></TextBox>
-
-                            <TextBlock Grid.Column="0"
-                               Grid.Row="7">Kraj</TextBlock>
-                            <TextBox Grid.Column="1"
-                               Grid.Row="7"
-                               IsReadOnly="True"
-                               Text="{x:Bind ProjectPageViewModel.ClosedProjectOverview.EndDate, Mode=TwoWay}"></TextBox>
-
-                            <TextBlock Grid.Column="0"
-                               Grid.Row="9">Saradnici na projektu</TextBlock>
-                            <ListView Grid.Column="1"
-                              Grid.Row="9"
-                              ItemsSource="{x:Bind ProjectPageViewModel.ClosedProjectOverview.CollaboratorOverviews, Mode=OneWay}">
-                                <ListView.ItemTemplate>
-                                    <DataTemplate x:DataType="c:CollaboratorOverview">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{x:Bind UserId}"></TextBlock>
-                                            <TextBlock Text="{x:Bind FirstName}"></TextBlock>
-                                            <TextBlock Text="{x:Bind LastName}"></TextBlock>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
-
-
-                            <TextBlock Grid.Column="0"
-                               Grid.Row="11">Tagovi</TextBlock>
-                            <GridView  Grid.Column="1"
-                              Grid.Row="11"
-                               ItemsSource="{x:Bind ProjectPageViewModel.ClosedProjectOverview.Tags, Mode=OneWay}">
-                                <GridView.ItemTemplate>
-                                    <DataTemplate x:DataType="c1:Tag">
-                                        <TextBlock Text="{x:Bind Name}"></TextBlock>
-                                    </DataTemplate>
-                                </GridView.ItemTemplate>
-                            </GridView>
-                        </Grid>
-
-                        <!-- Closed project controls -->
-                        <StackPanel Orientation="Horizontal"                                 
-                                    Grid.Row="2"
-                                    Grid.Column="0">
-                            <Button Margin="5"
-                                    Visibility="{x:Bind ProjectPageViewModel.DeleteButtonVisibility, Mode=TwoWay}">Obriši projekat</Button>
-                        </StackPanel>
-
-                    </Grid>
-                </StackPanel>
-
                 <!-- Sent applications -->
                 <controls:DataGrid 
                     Visibility="{x:Bind HomepageViewModel.Visibility.SentApplicationsVisibility, Mode=TwoWay}"
@@ -355,14 +562,25 @@
                 </controls:DataGrid>
 
                 <!-- Received applications -->
-                <StackPanel
-                    Visibility="{x:Bind HomepageViewModel.Visibility.ReceivedApplicationsVisibility, Mode=TwoWay}">
+                <Grid
+                    Visibility="{x:Bind HomepageViewModel.Visibility.ReceivedApplicationsVisibility, Mode=TwoWay}"
+                    Height="960">
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition Height="200"></RowDefinition>
+                    </Grid.RowDefinitions>
                     <controls:DataGrid                    
                     AutoGenerateColumns="True"
                     ItemsSource="{x:Bind ReceivedApplicationsViewModel.ReceivedApplications, Mode=TwoWay}"
-                    SelectedItem="{x:Bind ReceivedApplicationsViewModel.SelectedApplication, Mode=TwoWay}">
+                    SelectedItem="{x:Bind ReceivedApplicationsViewModel.SelectedApplication, Mode=TwoWay}"
+                    Grid.Row="0">
                     </controls:DataGrid>
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        Grid.Row="1"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Margin="30,0,0,0">
                         <Button Margin="5"
                             Visibility="{x:Bind ReceivedApplicationsViewModel.AcceptApplicationButtonVisibility, Mode=TwoWay}"
                             Click="{x:Bind ReceivedApplicationsViewModel.AcceptApplicationAsync}">Prihvati</Button>
@@ -371,185 +589,7 @@
                             Click="{x:Bind ReceivedApplicationsViewModel.RejectApplicationAsync}">Odbij</Button>
 
                     </StackPanel>
-                </StackPanel>
-
-                <!-- New project -->
-                <Grid Margin="20"
-                    Visibility="{x:Bind HomepageViewModel.Visibility.CreateProjectVisibility, Mode=OneWay}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Basic information -->
-                    <StackPanel
-                            Grid.Row="0"
-                            Grid.Column="0">
-
-                        <TextBlock >Naziv</TextBlock>
-                        <TextBox
-                                Text="{x:Bind CreateProjectViewModel.ProjectInputModel.Title, Mode=TwoWay}"></TextBox>
-
-                        <TextBlock>Opis</TextBlock>
-                        <TextBox 
-                                Text="{x:Bind CreateProjectViewModel.ProjectInputModel.Description, Mode=TwoWay}"></TextBox>
-
-                        <TextBlock>Naučna oblast</TextBlock>
-                        <ComboBox ItemsSource="{x:Bind CreateProjectViewModel.StudyFieldNames, Mode=OneTime}"
-                                      SelectedItem="{x:Bind CreateProjectViewModel.SelectedProjectStudyFieldName, Mode=TwoWay}">
-                        </ComboBox>
-
-                        <TextBlock >Početak</TextBlock>
-                        <DatePicker Date="{x:Bind CreateProjectViewModel.ProjectInputModel.StartDate, Mode=TwoWay}"/>
-
-                        <TextBlock>Kraj</TextBlock>
-                        <DatePicker Date="{x:Bind CreateProjectViewModel.ProjectInputModel.EndDate, Mode=TwoWay}"/>
-
-                        <TextBlock>Tagovi</TextBlock>
-                        <GridView
-                                ItemsSource="{x:Bind CreateProjectViewModel.AddedTags, Mode=OneWay}"
-                                IsItemClickEnabled="True"
-                                ItemClick="{x:Bind CreateProjectViewModel.TagRemoved}">
-                        </GridView>
-
-                        <AutoSuggestBox 
-                                ItemsSource="{x:Bind CreateProjectViewModel.TagNames, Mode=OneTime}"
-                                SuggestionChosen="{x:Bind CreateProjectViewModel.TagChosen}"
-                                TextChanged="{x:Bind CreateProjectViewModel.TagSearched}">
-                        </AutoSuggestBox>
-                    </StackPanel>
-
-                    <!-- Collaborator profiles -->
-                    <StackPanel
-                        Grid.Row="0"
-                            Grid.Column="1">
-                        <TextBlock>Profili</TextBlock>
-
-                        <ComboBox 
-                                ItemsSource="{x:Bind CreateProjectViewModel.CollaboratorProfileTypes, Mode=OneTime}"
-                                SelectionChanged="{x:Bind CreateProjectViewModel.CollaboratorProfileTypeChosenAsync}">
-                        </ComboBox>
-
-                        <TextBlock>Opis pozicije</TextBlock>
-                        <TextBox Text="{x:Bind CreateProjectViewModel.ProfileDescription, Mode=TwoWay}"></TextBox>
-
-                        <!-- Creating student profile -->
-                        <TextBlock Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}">Fakultet</TextBlock>
-                        <AutoSuggestBox
-                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}"
-                                ItemsSource="{x:Bind CreateProjectViewModel.FacultyNames, Mode=OneTime}"
-                                SuggestionChosen="{x:Bind CreateProjectViewModel.FacultyChosenAsync}"
-                                TextChanged="{x:Bind CreateProjectViewModel.FacultySearched}">
-                        </AutoSuggestBox>
-                        <TextBlock 
-                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}">Ciklus</TextBlock>
-                        <ComboBox 
-                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}"
-                                ItemsSource="{x:Bind CreateProjectViewModel.StudyCycles}"
-                                SelectionChanged="{x:Bind CreateProjectViewModel.CycleChosenAsync}">
-                        </ComboBox>
-
-                        <TextBlock
-                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}">Program</TextBlock>
-                        <AutoSuggestBox
-                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}"
-                                ItemsSource="{x:Bind CreateProjectViewModel.ProgramNames, Mode=OneWay}"
-                                SuggestionChosen="{x:Bind CreateProjectViewModel.ProgramChosenAsync}"
-                                TextChanged="{x:Bind CreateProjectViewModel.ProgramSearched}">
-                        </AutoSuggestBox>
-                        <TextBlock
-                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}">Smjer</TextBlock>
-                        <AutoSuggestBox
-                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}"
-                                ItemsSource="{x:Bind CreateProjectViewModel.SpecializationNames, Mode=OneWay}"
-                                SuggestionChosen="{x:Bind CreateProjectViewModel.SpecializationChosen}"
-                                TextChanged="{x:Bind CreateProjectViewModel.SpecializationSearched}">
-                        </AutoSuggestBox>
-                        <TextBlock
-                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}">Godina</TextBlock>
-                        <ComboBox
-                                Visibility="{x:Bind CreateProjectViewModel.CreatingStudentProfile, Mode=OneWay}">
-                            <ComboBoxItem>1</ComboBoxItem>
-                            <ComboBoxItem>2</ComboBoxItem>
-                            <ComboBoxItem>3</ComboBoxItem>
-                            <ComboBoxItem>4</ComboBoxItem>
-                        </ComboBox>
-
-                        <!-- Creating faculty member profiles-->
-                        <TextBlock
-                                Visibility="{x:Bind CreateProjectViewModel.CreatingFacultyMemberProfile, Mode=OneWay}">Fakultet</TextBlock>
-                        <AutoSuggestBox
-                                Visibility="{x:Bind CreateProjectViewModel.CreatingFacultyMemberProfile, Mode=OneWay}"
-                                ItemsSource="{x:Bind CreateProjectViewModel.FacultyNames, Mode=OneTime}"
-                                SuggestionChosen="{x:Bind CreateProjectViewModel.FacultyChosenAsync}"
-                                TextChanged="{x:Bind CreateProjectViewModel.FacultySearched}">
-                        </AutoSuggestBox>
-
-
-                        <TextBlock
-                                Visibility="{x:Bind CreateProjectViewModel.CreatingFacultyMemberProfile, Mode=OneWay}">Naučna oblast</TextBlock>
-                        <ComboBox 
-                                Visibility="{x:Bind CreateProjectViewModel.CreatingFacultyMemberProfile, Mode=OneWay}"
-                                ItemsSource="{x:Bind CreateProjectViewModel.StudyFieldNames, Mode=OneTime}"
-                                      SelectedItem="{x:Bind CreateProjectViewModel.SelectedFacultyMemberStudyFieldName, Mode=TwoWay}">
-                        </ComboBox>
-
-                        <TextBlock>Dodani studentski profili</TextBlock>
-                        <ListView ItemsSource="{x:Bind CreateProjectViewModel.StudentProfileInputModels}">
-                            <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="c2:StudentProfileInputModel">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{x:Bind Description}"></TextBlock>
-                                        <TextBlock Text="{x:Bind FacultyName}"></TextBlock>
-                                        <TextBlock Text="{x:Bind StudyProgramName}"></TextBlock>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-
-                        <TextBlock>Dodani profili nastavnog osoblja</TextBlock>
-                        <ListView ItemsSource="{x:Bind CreateProjectViewModel.FacultyMemberProfileInputModels}">
-                            <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="c2:FacultyMemberProfileInputModel">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{x:Bind Description}"></TextBlock>
-                                        <TextBlock Text="{x:Bind FacultyName}"></TextBlock>
-                                        <TextBlock Text="{x:Bind StudyFieldName}"></TextBlock>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-
-
-
-                    </StackPanel>
-
-                    <!-- Collaborator profiles controls -->
-                    <StackPanel Orientation="Horizontal"
-                                Grid.Row="1"
-                            Grid.Column="1">
-                        <Button
-                                Click="{x:Bind CreateProjectViewModel.AddProfile}">Dodaj profil</Button>
-                    </StackPanel>
-
-                    <!-- Create project page controls -->
-                    <StackPanel Orientation="Horizontal"                                 
-                                Grid.Row="1"
-                            Grid.Column="0">
-                        <Button Margin="5"
-                                Click="{x:Bind CreateProjectViewModel.SaveProject}"
-                                    >Sačuvaj</Button>
-                        <Button Margin="5"
-                                    >Odustani</Button>
-                    </StackPanel>
-
-
                 </Grid>
-
             </StackPanel>
         </NavigationView>
     </Grid>

@@ -34,7 +34,8 @@ namespace eduProjectDesktop.ViewModel
 
         public CreateProjectViewModel CreateProjectViewModel { get; set; }
 
-        public string SectionName { get; set; } = "Sekcija";
+        private string sectionName;
+        public string SectionName { get { return sectionName; } set { sectionName = value; OnPropertyChanged(); } }
 
         // project snippets and selected snippet
         public ObservableCollection<ProjectSnippet> ProjectSnippets { get; set; } = new ObservableCollection<ProjectSnippet>();
@@ -45,24 +46,32 @@ namespace eduProjectDesktop.ViewModel
 
         public ProjectSnippet SelectedSnippet { get; set; }
 
-        // menu item selection
-
-        private object selectedMenuItem;
-
-        // TODO: trebamo li ovdje zvati event? selekcija se ne mijenja sa user strane.
-        public object SelectedMenuItem { get { return selectedMenuItem; } set { selectedMenuItem = value; OnPropertyChanged(); } }
-
-        public HomepageViewModel()
+        public ObservableCollection<string> NavigationItems = new ObservableCollection<string>();
+        public async void PopulateNavigationItems()
         {
-
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                NavigationItems.Add("Početna");
+                NavigationItems.Add("Moji projekti");
+                NavigationItems.Add("Moje prijave");
+                NavigationItems.Add("Pristigle prijave");
+                NavigationItems.Add("Novi projekat");
+            });
         }
 
-        public async void MenuItemSelectionChanged()
+        public async void MenuItemSelectionChanged(object sender, NavigationViewSelectionChangedEventArgs e)
         {
-            if (SelectedMenuItem != null)
+            string selectedMenuItem = (string)e.SelectedItem;
+            if (selectedMenuItem != null)
             {
-                string content = (string)((NavigationViewItem)SelectedMenuItem).Content;
-                switch (content)
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+                () =>
+                {
+                    SectionName = selectedMenuItem;
+                });
+
+                switch (selectedMenuItem)
                 {
                     case "Moje prijave":
                         {
@@ -98,6 +107,7 @@ namespace eduProjectDesktop.ViewModel
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             () =>
             {
+                SectionName = "Svi projekti";
                 ProjectSnippets.Clear();
                 Visibility.ChangeVisibility(true, "Homepage");
             });
@@ -122,6 +132,7 @@ namespace eduProjectDesktop.ViewModel
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             () =>
             {
+                SectionName = "Moji projekti";
                 ProjectSnippets.Clear();
                 Visibility.ChangeVisibility(true, "Homepage");
             });
@@ -198,6 +209,7 @@ namespace eduProjectDesktop.ViewModel
 
             });
         }
+
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

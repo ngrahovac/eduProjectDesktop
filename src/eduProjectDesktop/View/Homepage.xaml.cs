@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -31,7 +32,10 @@ namespace eduProjectDesktop.View
         public Homepage()
         {
             this.InitializeComponent();
+
             HomepageViewModel = new HomepageViewModel();
+            Task.Run(() => HomepageViewModel.PopulateNavigationItems());
+            Task.Run(() => HomepageViewModel.SectionName = "Početna");
 
             ProjectPageViewModel = new ProjectPageViewModel();
             HomepageViewModel.ProjectPageViewModel = ProjectPageViewModel;
@@ -45,6 +49,7 @@ namespace eduProjectDesktop.View
 
             CreateProjectViewModel = new CreateProjectViewModel();
             HomepageViewModel.CreateProjectViewModel = CreateProjectViewModel;
+            CreateProjectViewModel.HomepageViewModel = HomepageViewModel;
         }
 
     }

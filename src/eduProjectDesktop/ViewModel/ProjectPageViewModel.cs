@@ -217,6 +217,8 @@ namespace eduProjectDesktop.ViewModel
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             () =>
             {
+                IsEditDisabled = true;
+
                 IEnumerable<Tag> tags = ((App)App.Current).tags.GetAll();
                 foreach (var tag in tags)
                     SuggestedTags.Add(tag.Name);
@@ -267,6 +269,10 @@ namespace eduProjectDesktop.ViewModel
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             () =>
             {
+                HomepageViewModel.SectionName = $"Projekat #{SelectedProject.ProjectId}";
+                IsEditDisabled = true;
+                IsEditEnabled = false;
+
                 if (SelectedProject.ProjectStatus == ProjectStatus.Active)
                 {
                     if (SelectedProject.AuthorId == User.CurrentUserId)
@@ -276,9 +282,16 @@ namespace eduProjectDesktop.ViewModel
                         SaveButtonVisibility = Visibility.Visible;
                         CancelButtonVisibility = Visibility.Visible;
                         CloseProjectButtonVisibility = Visibility.Visible;
+                        ApplyButtonVisibility = Visibility.Collapsed;
+                        RevokeButtonVisibility = Visibility.Collapsed;
                     }
                     else
                     {
+                        EditButtonVisibility = Visibility.Collapsed;
+                        DeleteButtonVisibility = Visibility.Collapsed;
+                        SaveButtonVisibility = Visibility.Collapsed;
+                        CancelButtonVisibility = Visibility.Collapsed;
+                        CloseProjectButtonVisibility = Visibility.Collapsed;
                         ApplyButtonVisibility = Visibility.Visible;
                         RevokeButtonVisibility = Visibility.Visible;
                     }
@@ -287,11 +300,23 @@ namespace eduProjectDesktop.ViewModel
                 {
                     if (SelectedProject.AuthorId == User.CurrentUserId)
                     {
+                        EditButtonVisibility = Visibility.Collapsed;
                         DeleteButtonVisibility = Visibility.Visible;
+                        SaveButtonVisibility = Visibility.Collapsed;
+                        CancelButtonVisibility = Visibility.Collapsed;
+                        CloseProjectButtonVisibility = Visibility.Collapsed;
+                        ApplyButtonVisibility = Visibility.Collapsed;
+                        RevokeButtonVisibility = Visibility.Collapsed;
                     }
                     else
                     {
+                        EditButtonVisibility = Visibility.Collapsed;
                         DeleteButtonVisibility = Visibility.Collapsed;
+                        SaveButtonVisibility = Visibility.Collapsed;
+                        CancelButtonVisibility = Visibility.Collapsed;
+                        CloseProjectButtonVisibility = Visibility.Collapsed;
+                        ApplyButtonVisibility = Visibility.Collapsed;
+                        RevokeButtonVisibility = Visibility.Collapsed;
                     }
                 }
             });
@@ -383,8 +408,7 @@ namespace eduProjectDesktop.ViewModel
             {
                 ProjectApplication application = new ProjectApplication
                 {
-                    ApplicantId = User.CurrentUserId,
-                    ApplicantComment = ""
+                    ApplicantId = User.CurrentUserId
                 };
 
                 if (selectedFacultyMemberProfileIndex != -1)
@@ -424,9 +448,15 @@ namespace eduProjectDesktop.ViewModel
 
         }
 
-        public void DeleteProject()
+        public async void DeleteProjectAsync()
         {
-            throw new NotImplementedException();
+            await ((App)App.Current).projects.DeleteProjectAsync(SelectedProject);
+
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            async () =>
+            {
+                await HomepageViewModel.LoadProjects();
+            });
         }
 
         public async Task CloseProjectAsync()
@@ -492,12 +522,11 @@ namespace eduProjectDesktop.ViewModel
             await ((App)App.Current).projects.UpdateAsync(project);
 
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-           async () =>
-           {
-               IsEditDisabled = true;
-               IsEditEnabled = false;
-               SelectedProject = await ((App)App.Current).projects.GetAsync(SelectedProject.ProjectId); ;
-           });
+            async () =>
+            {
+                SelectedProject = await ((App)App.Current).projects.GetAsync(SelectedProject.ProjectId);
+                await HomepageViewModel.LoadProjects();
+            });
 
         }
 
@@ -506,12 +535,9 @@ namespace eduProjectDesktop.ViewModel
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             async () =>
             {
-                IsEditDisabled = true;
-                IsEditEnabled = false;
                 await HomepageViewModel.LoadProjects();
             });
         }
-
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

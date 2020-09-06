@@ -19,6 +19,7 @@ namespace eduProjectDesktop.ViewModel
 {
     public class CreateProjectViewModel : INotifyPropertyChanged
     {
+        public HomepageViewModel HomepageViewModel { get; set; }
         public ProjectInputModel ProjectInputModel { get; set; } = new ProjectInputModel();
 
         public ObservableCollection<string> StudyFieldNames = new ObservableCollection<string>();
@@ -37,6 +38,8 @@ namespace eduProjectDesktop.ViewModel
 
         public ObservableCollection<int> StudyCycles = new ObservableCollection<int>();
 
+        public ObservableCollection<int> StudyYears = new ObservableCollection<int>();
+
         public ObservableCollection<StudentProfileInputModel> StudentProfileInputModels = new ObservableCollection<StudentProfileInputModel>();
 
         public ObservableCollection<FacultyMemberProfileInputModel> FacultyMemberProfileInputModels = new ObservableCollection<FacultyMemberProfileInputModel>();
@@ -50,7 +53,7 @@ namespace eduProjectDesktop.ViewModel
             set { creatingStudentProfile = value; OnPropertyChanged(); }
         }
 
-        public bool creatingFacultyMemberProfile { get; set; } = false;
+        public bool creatingFacultyMemberProfile = false;
         public bool CreatingFacultyMemberProfile
         {
             get { return creatingFacultyMemberProfile; }
@@ -67,6 +70,7 @@ namespace eduProjectDesktop.ViewModel
                 profileDescription = value;
                 if (CreatingStudentProfile) { StudentProfileInputModel.Description = value; }
                 else if (creatingFacultyMemberProfile) { FacultyMemberProfileInputModel.Description = value; }
+                OnPropertyChanged();
             }
         }
         public StudentProfileInputModel StudentProfileInputModel { get; set; } = new StudentProfileInputModel();
@@ -99,6 +103,8 @@ namespace eduProjectDesktop.ViewModel
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             () =>
             {
+                HomepageViewModel.SectionName = "Novi projekat";
+
                 var studyFieldNames = new ObservableCollection<string>(((App)App.Current).faculties.GetAllStudyFields().Select(e => e.Name));
                 foreach (var item in studyFieldNames)
                     StudyFieldNames.Add(item);
@@ -154,8 +160,13 @@ namespace eduProjectDesktop.ViewModel
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
             () =>
             {
-                CreatingStudentProfile = type == "Student" ? true : false;
+                CreatingStudentProfile = type == "Student";
                 CreatingFacultyMemberProfile = !CreatingStudentProfile;
+
+                ProfileDescription = string.Empty;
+                StudentProfileInputModel = new StudentProfileInputModel();
+                FacultyMemberProfileInputModel = new FacultyMemberProfileInputModel();
+
             });
 
         }
@@ -218,11 +229,13 @@ namespace eduProjectDesktop.ViewModel
             () =>
             {
                 SpecializationNames.Clear();
-                var specializationNames = ((App)App.Current).faculties.GetAll().First(f => f.Name == StudentProfileInputModel.FacultyName)
-                                                                               .StudyPrograms.Values.First(sp => sp.Name == programName)
-                                                                               .StudyProgramSpecializations.Values.Select(sps => sps.Name);
-                foreach (var name in specializationNames)
-                    SpecializationNames.Add(name);
+                StudyProgram studyProgram = ((App)App.Current).faculties.GetAll().First(f => f.Name == StudentProfileInputModel.FacultyName)
+                                                                               .StudyPrograms.Values.First(sp => sp.Name == programName);
+                var specializationNames = studyProgram.StudyProgramSpecializations.Values.Select(sps => sps.Name);
+
+                StudyYears.Clear();
+                for (int i = 1; i <= studyProgram.DurationYears; i++)
+                    StudyYears.Add(i);
             });
         }
 
@@ -246,6 +259,17 @@ namespace eduProjectDesktop.ViewModel
             {
                 sender.ItemsSource = SpecializationNames.Where(s => s.StartsWith(sender.Text));
             }
+        }
+
+        public async void StudyYearChosenAsync(object sender, SelectionChangedEventArgs e)
+        {
+            int year = (int)e.AddedItems.ElementAt(0);
+
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                StudentProfileInputModel.StudyYear = year;
+            });
         }
 
         public async void AddProfile()

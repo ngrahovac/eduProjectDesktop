@@ -314,8 +314,8 @@ namespace eduProjectDesktop.Data
                 int id = application.ProjectApplicationId;
 
                 string commandText = @"DELETE
-                                   FROM project_application
-                                   WHERE project_application_id = @id";
+                                       FROM project_application
+                                       WHERE project_application_id = @id";
 
                 MySqlCommand command = new MySqlCommand
                 {
